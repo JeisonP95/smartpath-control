@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Graph from "./pages/graph/Graph"
 import ControlPanel from "./pages/controlPanel/ControlPanel"
 import PathFinder from "./pages/pathFinder/PathFinder"
-import RouteHistory from "./pages/RouteHistory"
+import RouteHistory from "./pages/routeHistory/RouteHistory"
 import { getNodes, getEdges, getConditions, getVehicles, getAvailableAlgorithms } from "./services/api"
 import type {
   NodeData,

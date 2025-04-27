@@ -1,17 +1,7 @@
 import { useState, useEffect } from "react"
-import { getRouteHistory } from "../services/api"
+import { getRouteHistory } from "../../services/api"
+import { RouteHistoryItem } from "./interface"
 
-interface RouteHistoryItem {
-  id: number
-  start_node: string
-  end_node: string
-  path: string
-  distance: number
-  estimated_time: number | null
-  algorithm: string
-  created_at: string
-  vehicles: { name: string } | null
-}
 
 const RouteHistory = () => {
   const [history, setHistory] = useState<RouteHistoryItem[]>([])
