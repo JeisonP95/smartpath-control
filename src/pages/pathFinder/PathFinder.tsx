@@ -1,15 +1,7 @@
-"use client"
-
 import { useState } from "react"
-import type { NodeData, PathResult, Vehicle, RouteAlgorithm } from "../data"
-import { calculateRoute } from "../data/api"
-
-interface Props {
-  nodes: NodeData[]
-  vehicles: Vehicle[]
-  algorithms: RouteAlgorithm[]
-  onPathResult: (result: PathResult | null) => void
-}
+import type { NodeData, PathResult, Vehicle, RouteAlgorithm } from "../../services"
+import { calculateRoute } from "../../services/api"
+import { Props } from "./interface"
 
 const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
   const [startNode, setStartNode] = useState<string>("1")

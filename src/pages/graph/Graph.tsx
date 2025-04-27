@@ -1,58 +1,14 @@
-"use client"
-
 import { useCallback, useState } from "react"
 import ReactFlow, {
   Background,
   Controls,
   type Edge as ReactFlowEdge,
   type Node as ReactFlowNode,
-  type NodeTypes,
-  Handle,
-  Position,
-  type NodeProps,
 } from "reactflow"
 import "reactflow/dist/style.css"
-import type { NodeData, Edge } from "../data/index"
-import GoogleMapView from "./GoogleMapView"
-
-// Componentes personalizados para los nodos
-const BodegaNode = ({ data }: NodeProps) => (
-  <div className="node bodega-node">
-    <Handle type="target" position={Position.Top} />
-    <div>{data.label}</div>
-    <Handle type="source" position={Position.Bottom} />
-  </div>
-)
-
-const ZonaCargaNode = ({ data }: NodeProps) => (
-  <div className="node zona-carga-node">
-    <Handle type="target" position={Position.Top} />
-    <div>{data.label}</div>
-    <Handle type="source" position={Position.Bottom} />
-  </div>
-)
-
-const DistribucionNode = ({ data }: NodeProps) => (
-  <div className="node distribucion-node">
-    <Handle type="target" position={Position.Top} />
-    <div>{data.label}</div>
-    <Handle type="source" position={Position.Bottom} />
-  </div>
-)
-
-// Definición de tipos de nodos personalizados
-const nodeTypes: NodeTypes = {
-  bodega: BodegaNode,
-  zonaCarga: ZonaCargaNode,
-  distribucion: DistribucionNode,
-}
-
-interface Props {
-  nodes: NodeData[]
-  edges: Edge[]
-  highlightedPath?: string[] | null
-  title?: string
-}
+import GoogleMapView from "../../components/map/GoogleMapView"
+import { Props } from "./interface"
+import { nodeTypes } from "./graph.data"
 
 const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas" }: Props) => {
   const [viewMode, setViewMode] = useState<"graph" | "map">("graph")

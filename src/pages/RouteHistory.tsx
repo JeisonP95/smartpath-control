@@ -1,7 +1,5 @@
-"use client"
-
 import { useState, useEffect } from "react"
-import { getRouteHistory } from "../data/api"
+import { getRouteHistory } from "../services/api"
 
 interface RouteHistoryItem {
   id: number

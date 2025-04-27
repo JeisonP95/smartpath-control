@@ -1,4 +1,4 @@
-import type { Edge } from "../data"
+import type { Edge } from "."
 
 // Define el tipo ConditionMap para uso interno
 export type ConditionMap = Record<string, boolean>

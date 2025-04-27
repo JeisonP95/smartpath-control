@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from "./supabase"
-import type { NodeData, Edge, Vehicle, ConditionMap, Condition, PathResult, RouteAlgorithm } from "../data"
+import type { NodeData, Edge, Vehicle, ConditionMap, Condition, PathResult, RouteAlgorithm } from "."
 import {
   findShortestPathDijkstra,
   findShortestPathAStar,

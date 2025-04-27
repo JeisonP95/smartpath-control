@@ -1,36 +1,8 @@
-"use client"
-
 import { useState, useEffect, useCallback, useRef } from "react"
 import { GoogleMap, LoadScript, Marker, Polyline, InfoWindow } from "@react-google-maps/api"
-import type { NodeData, Edge } from "../types"
-
-// Estilos para el contenedor del mapa
-const containerStyle = {
-  width: "100%",
-  height: "100%",
-}
-
-// Colores para los diferentes tipos de nodos
-const nodeColors = {
-  bodega: "#3498db",
-  zonaCarga: "#e67e22",
-  distribucion: "#9b59b6",
-}
-
-// Opciones para el mapa
-const mapOptions = {
-  disableDefaultUI: false,
-  zoomControl: true,
-  mapTypeControl: true,
-  streetViewControl: false,
-  fullscreenControl: true,
-}
-
-interface Props {
-  nodes: NodeData[]
-  edges: Edge[]
-  highlightedPath?: string[] | null
-}
+import type { NodeData } from "../../services"
+import { Props } from "./interface"
+import { containerStyle, mapOptions, nodeColors } from "./map.data"
 
 const GoogleMapView = ({ nodes, edges, highlightedPath }: Props) => {
   const [center, setCenter] = useState({ lat: 4.6097, lng: -74.0817 }) // Bogotá por defecto

@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Graph from "./components/Graph"
-import ControlPanel from "./components/ControlPanel"
-import PathFinder from "./components/PathFinder"
-import RouteHistory from "./components/RouteHistory"
-import { getNodes, getEdges, getConditions, getVehicles, getAvailableAlgorithms } from "../src/data/api"
+import Graph from "./pages/graph/Graph"
+import ControlPanel from "./pages/controlPanel/ControlPanel"
+import PathFinder from "./pages/pathFinder/PathFinder"
+import RouteHistory from "./pages/RouteHistory"
+import { getNodes, getEdges, getConditions, getVehicles, getAvailableAlgorithms } from "./services/api"
 import type {
   NodeData,
   Edge,
@@ -15,8 +15,8 @@ import type {
   Vehicle,
   RouteAlgorithm,
   ConditionKey,
-} from "../src/data"
-import { evalCondition } from "../src/data/algorithms"
+} from "./services"
+import { evalCondition } from "./services/algorithms"
 import "./App.css"
 
 function App() {

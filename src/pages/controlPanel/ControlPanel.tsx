@@ -1,14 +1,7 @@
-"use client"
-
 import { useState } from "react"
-import type { Condition, ConditionKey, ConditionMap } from "../data"
-import { updateCondition } from "../data/api"
-
-interface Props {
-  conditions: Condition[]
-  activeConditions: ConditionMap
-  toggle: (key: ConditionKey) => void
-}
+import type { ConditionKey } from "../../services"
+import { updateCondition } from "../../services/api"
+import { Props } from "./interface"
 
 const ControlPanel = ({ conditions, activeConditions, toggle }: Props) => {
   const [updating, setUpdating] = useState<string | null>(null)
