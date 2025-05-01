@@ -1,5 +1,5 @@
 import { useState } from "react"
-import type { NodeData, PathResult, Vehicle, RouteAlgorithm } from "../../services"
+import type { PathResult } from "../../services"
 import { calculateRoute } from "../../services/api"
 import { Props } from "./interface"
 
@@ -7,7 +7,7 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
   const [startNode, setStartNode] = useState<string>("1")
   const [endNode, setEndNode] = useState<string>("3")
   const [selectedVehicle, setSelectedVehicle] = useState<number | undefined>(undefined)
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState<string>("dijkstra")
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState<string>("A*")
   const [optimizeFor, setOptimizeFor] = useState<"distance" | "time">("distance")
   const [pathResult, setPathResult] = useState<PathResult | null>(null)
   const [isCalculating, setIsCalculating] = useState<boolean>(false)
@@ -119,7 +119,7 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
                 type="radio"
                 name="optimize"
                 value="time"
-                checked={optimizeFor === "time"}
+                checked={optimizeFor === "time"} 
                 onChange={() => setOptimizeFor("time")}
               />
               Tiempo

@@ -6,7 +6,7 @@ import {
 } from "reactflow"
 import "reactflow/dist/style.css"
 
-const BodegaNode = ({ data }: NodeProps) => (
+export const BodegaNode = ({ data }: NodeProps) => (
   <div className="node bodega-node">
     <Handle type="target" position={Position.Top} />
     <div>{data.label}</div>

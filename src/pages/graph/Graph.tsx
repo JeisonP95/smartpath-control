@@ -1,17 +1,14 @@
-import { useCallback, useState } from "react"
-import ReactFlow, {
-  Background,
-  Controls,
-  type Edge as ReactFlowEdge,
-  type Node as ReactFlowNode,
-} from "reactflow"
+"use client"
+
+import { useCallback} from "react"
+import ReactFlow, {Background,Controls,type Edge as ReactFlowEdge,type Node as ReactFlowNode,} from "reactflow"
 import "reactflow/dist/style.css"
-import GoogleMapView from "../../components/map/GoogleMapView"
 import { Props } from "./interface"
 import { nodeTypes } from "./graph.data"
 
+
 const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas" }: Props) => {
-  const [viewMode, setViewMode] = useState<"graph" | "map">("graph")
+
 
   // Crear nodos para reactflow
   const reactFlowNodes: ReactFlowNode[] = nodes.map((node) => ({
@@ -53,32 +50,20 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
     }
   })
 
-  const toggleViewMode = () => {
-    setViewMode(viewMode === "graph" ? "map" : "graph")
-  }
 
   return (
     <div className="graph-container">
       <div className="graph-header">
         <h2>{title}</h2>
-        <button className="view-toggle-button" onClick={toggleViewMode}>
-          {viewMode === "graph" ? "Ver en Mapa Real" : "Ver en Grafo"}
-        </button>
       </div>
-
-      {viewMode === "graph" ? (
-        <div className="graph-view">
-          <ReactFlow nodes={reactFlowNodes} edges={reactFlowEdges} nodeTypes={nodeTypes} fitView>
-            <Background />
-            <Controls />
-          </ReactFlow>
-        </div>
-      ) : (
-        <div className="map-view">
-          <GoogleMapView nodes={nodes} edges={edges} highlightedPath={highlightedPath} />
-        </div>
-      )}
-
+  
+      <div className="graph-view">
+        <ReactFlow nodes={reactFlowNodes} edges={reactFlowEdges} nodeTypes={nodeTypes} fitView>
+          <Background />
+          <Controls />
+        </ReactFlow>
+      </div>
+  
       <div className="graph-legend">
         <div className="legend-item">
           <div className="legend-color" style={{ backgroundColor: "#00cc44" }}></div>
@@ -91,6 +76,7 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
       </div>
     </div>
   )
+  
 }
 
-export default Graph
+export default Graph;

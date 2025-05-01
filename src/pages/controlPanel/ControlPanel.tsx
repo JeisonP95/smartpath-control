@@ -2,6 +2,7 @@ import { useState } from "react"
 import type { ConditionKey } from "../../services"
 import { updateCondition } from "../../services/api"
 import { Props } from "./interface"
+import { Leaf } from "../../components/icons/icons"
 
 const ControlPanel = ({ conditions, activeConditions, toggle }: Props) => {
   const [updating, setUpdating] = useState<string | null>(null)
@@ -20,7 +21,10 @@ const ControlPanel = ({ conditions, activeConditions, toggle }: Props) => {
 
   return (
     <div className="control-panel">
-      <h2>Panel de Control</h2>
+      <h2>
+        Panel de Control
+<Leaf size={20} className="control-panel-icon" />
+      </h2>
       <p className="control-description">Ajuste las condiciones para ver cómo afectan a las rutas disponibles</p>
 
       <div className="conditions-grid">

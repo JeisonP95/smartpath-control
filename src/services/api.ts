@@ -1,9 +1,7 @@
 import { createServerSupabaseClient } from "./supabase"
 import type { NodeData, Edge, Vehicle, ConditionMap, Condition, PathResult, RouteAlgorithm } from "."
 import {
-  findShortestPathDijkstra,
   findShortestPathAStar,
-  findAllShortestPathsFloydWarshall,
   evalCondition,
 } from "./algorithms"
 
@@ -14,17 +12,9 @@ const mockNodes: NodeData[] = [
   { id: "3", label: "Bodega C", x: 250, y: 300, type: "bodega", latitude: 4.6145, longitude: -74.0648 },
   { id: "4", label: "Zona Carga 1", x: 150, y: 200, type: "zonaCarga", latitude: 4.6189, longitude: -74.0756 },
   { id: "5", label: "Zona Carga 2", x: 350, y: 200, type: "zonaCarga", latitude: 4.6278, longitude: -74.0723 },
-  {
-    id: "6",
-    label: "Distribución Central",
-    x: 250,
-    y: 150,
-    type: "distribucion",
-    latitude: 4.6201,
-    longitude: -74.0701,
-  },
+  {id: "6",label: "Distribución Central",x: 250,y: 150,type: "distribucion",latitude: 4.6201,longitude: -74.0701,},
 ]
-
+// Crear un grafo no dirigido (bidireccional)
 const mockEdges: Edge[] = [
   { from: "1", to: "4", condition: "!lluvia && permisoCarga", distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
   { from: "4", to: "2", condition: "!traficoAlto || !horasPico", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
@@ -32,16 +22,38 @@ const mockEdges: Edge[] = [
   { from: "6", to: "2", condition: "!mantenimiento", distance: 4, estimatedTime: 12, trafficFactor: 1.0 },
   { from: "2", to: "5", condition: "permisoCarga && !lluvia", distance: 6, estimatedTime: 18, trafficFactor: 1.1 },
   { from: "5", to: "3", condition: "!traficoAlto", distance: 7, estimatedTime: 20, trafficFactor: 1.3 },
-  {
-    from: "3",
-    to: "1",
-    condition: "!mantenimiento && !horasPico",
-    distance: 12,
-    estimatedTime: 35,
-    trafficFactor: 1.2,
-  },
+  {from: "3",to: "1",condition: "!mantenimiento && !horasPico",distance: 12,estimatedTime: 35,trafficFactor: 1.2,},
   { from: "6", to: "3", condition: "!lluvia || !traficoAlto", distance: 9, estimatedTime: 28, trafficFactor: 1.1 },
+  { from: "4", to: "5", condition: "true", distance: 7, estimatedTime: 21, trafficFactor: 1.2 },
+  { from: "5", to: "4", condition: "true", distance: 7, estimatedTime: 21, trafficFactor: 1.2 },
+  { from: "1", to: "2", condition: "true", distance: 10, estimatedTime: 30, trafficFactor: 1.1 },
+  { from: "2", to: "1", condition: "true", distance: 10, estimatedTime: 30, trafficFactor: 1.1 },
+  { from: "4", to: "6", condition: "true", distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
+  { from: "6", to: "4", condition: "true", distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
+  { from: "5", to: "6", condition: "true", distance: 6, estimatedTime: 18, trafficFactor: 1.0 },
+  { from: "6", to: "5", condition: "true", distance: 6, estimatedTime: 18, trafficFactor: 1.0 },
+  { from: "2", to: "3", condition: "true", distance: 8, estimatedTime: 24, trafficFactor: 1.1 },
+  { from: "3", to: "2", condition: "true", distance: 8, estimatedTime: 24, trafficFactor: 1.1 },
 ]
+
+const bidirectionalEdges = [];
+    mockEdges.forEach(edge => {
+      // Añadir arista original
+      bidirectionalEdges.push({...edge});
+      
+      // Añadir arista en dirección inversa si no existe ya
+      const reverseExists = mockEdges.some(e => e.from === edge.to && e.to === edge.from);
+      if (!reverseExists) {
+        bidirectionalEdges.push({
+          from: edge.to,
+          to: edge.from,
+          condition: edge.condition,
+          distance: edge.distance,
+          estimatedTime: edge.estimatedTime,
+          trafficFactor: edge.trafficFactor
+        });
+      }
+    });
 
 const mockConditions: Condition[] = [
   { key: "lluvia", label: "Lluvia", description: "Condiciones climáticas desfavorables", icon: "🌧️", active: false },
@@ -52,10 +64,10 @@ const mockConditions: Condition[] = [
     icon: "📝",
     active: true,
   },
-  { key: "traficoAlto", label: "Tráfico Alto", description: "Congestión en las vías", icon: "🚦", active: false },
   { key: "mantenimiento", label: "Mantenimiento", description: "Vías en reparación", icon: "🔧", active: false },
   { key: "horasPico", label: "Horas Pico", description: "Horarios de alta congestión", icon: "⏰", active: false },
 ]
+
 
 const mockVehicles: Vehicle[] = [
   { id: 1, name: "Camión 1", type: "camion", capacity: 5000, speedFactor: 0.8, available: true },
@@ -273,31 +285,21 @@ export async function calculateRoute(
     estimatedTime: (edge.estimatedTime || edge.distance * 3) / vehicleSpeedFactor,
   }))
 
-  // Calcular ruta según el algoritmo seleccionado
-  let result: PathResult | null = null
+    // Calcular ruta usando exclusivamente A*
+const nodes = await getNodes()
+const nodesMap: Record<string, { x: number; y: number }> = {}
+nodes.forEach((node) => {
+  nodesMap[node.id] = { x: node.x, y: node.y }
+})
 
-  if (algorithm === "dijkstra") {
-    result = findShortestPathDijkstra(start, end, adjustedEdges, optimizeFor)
-  } else if (algorithm === "astar") {
-    // Obtener nodos para la heurística
-    const nodes = await getNodes()
-    const nodesMap: Record<string, { x: number; y: number }> = {}
-    nodes.forEach((node) => {
-      nodesMap[node.id] = { x: node.x, y: node.y }
-    })
+const result: PathResult | null = findShortestPathAStar(
+  start,
+  end,
+  adjustedEdges,
+  nodesMap,
+  optimizeFor
+)
 
-    result = findShortestPathAStar(start, end, adjustedEdges, nodesMap, optimizeFor)
-  } else if (algorithm === "floydwarshall") {
-    const allPaths = findAllShortestPathsFloydWarshall(adjustedEdges, optimizeFor)
-    if (allPaths[start] && allPaths[start][end]) {
-      const path = allPaths[start][end]
-      result = {
-        path: path.path,
-        distance: path.distance,
-        estimatedTime: path.estimatedTime,
-      }
-    }
-  }
 
   // Si se encontró una ruta y no estamos en desarrollo, guardarla en el historial
   if (result && !isDevelopment) {
@@ -329,17 +331,9 @@ export async function calculateRoute(
 export function getAvailableAlgorithms(): RouteAlgorithm[] {
   return [
     {
-      name: "dijkstra",
-      description: "Algoritmo clásico para encontrar la ruta más corta",
-    },
-    {
       name: "astar",
       description: "Algoritmo A* que usa heurística para optimizar la búsqueda",
-    },
-    {
-      name: "floydwarshall",
-      description: "Algoritmo que calcula todas las rutas más cortas entre todos los pares de nodos",
-    },
+    }
   ]
 }
 

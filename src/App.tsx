@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import Graph from "./pages/graph/Graph"
 import ControlPanel from "./pages/controlPanel/ControlPanel"
