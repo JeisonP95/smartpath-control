@@ -22,7 +22,7 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
     data: { label: node.label },
     position: { x: node.x, y: node.y },
     type: node.type,
-    // Solo permitir arrastrar nodos de tipo bodega
+    // permitir arrastrar nodos
     draggable: node.type === "distribucion" || node.type === "bodega"|| node.type === "zonaCarga",
    
     
