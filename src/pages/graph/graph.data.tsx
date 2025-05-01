@@ -1,9 +1,4 @@
-import {
-  type NodeTypes,
-  Handle,
-  Position,
-  type NodeProps,
-} from "reactflow"
+import { type NodeTypes, Handle, Position, type NodeProps } from "reactflow"
 import "reactflow/dist/style.css"
 
 export const BodegaNode = ({ data }: NodeProps) => (
@@ -12,7 +7,7 @@ export const BodegaNode = ({ data }: NodeProps) => (
     <div>{data.label}</div>
     <Handle type="source" position={Position.Bottom} />
   </div>
-);
+)
 
 const ZonaCargaNode = ({ data }: NodeProps) => (
   <div className="node zona-carga-node">
@@ -20,7 +15,7 @@ const ZonaCargaNode = ({ data }: NodeProps) => (
     <div>{data.label}</div>
     <Handle type="source" position={Position.Bottom} />
   </div>
-);
+)
 
 const DistribucionNode = ({ data }: NodeProps) => (
   <div className="node distribucion-node">
@@ -28,7 +23,7 @@ const DistribucionNode = ({ data }: NodeProps) => (
     <div>{data.label}</div>
     <Handle type="source" position={Position.Bottom} />
   </div>
-);
+)
 
 export const nodeTypes: NodeTypes = {
   bodega: BodegaNode,

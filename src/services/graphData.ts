@@ -24,7 +24,7 @@ export const nodes: NodeData[] = [
   { id: '3', label: 'Bodega C', x: 250, y: 300, type: 'bodega' },
   { id: '4', label: 'Zona Carga 1', x: 150, y: 200, type: 'zonaCarga' },
   { id: '5', label: 'Zona Carga 2', x: 350, y: 200, type: 'zonaCarga' },
-  { id: '6', label: 'Distribución Central', x: 250, y: 150, type: 'distribucion' }
+  { id: '6', label: 'Distribucion Central', x: 250, y: 150, type: 'distribucion' }
 ];
 
 // Conexiones entre nodos con condiciones booleanas
