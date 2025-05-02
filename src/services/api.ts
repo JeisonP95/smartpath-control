@@ -6,18 +6,42 @@ import {
 } from "./algorithms"
 
 // Datos de ejemplo para desarrollo local
+
+
 const mockNodes: NodeData[] = [
-  { id: "1", label: "Bodega A", x: 100, y: 100, type: "bodega", latitude: 4.6097, longitude: -74.0817 },
-  { id: "2", label: "Bodega B", x: 400, y: 100, type: "bodega", latitude: 4.6234, longitude: -74.0836 },
-  { id: "3", label: "Bodega C", x: 250, y: 300, type: "bodega", latitude: 4.6145, longitude: -74.0648 },
-  { id: "4", label: "Zona Carga 1", x: 150, y: 200, type: "zonaCarga", latitude: 4.6189, longitude: -74.0756 },
-  { id: "5", label: "Zona Carga 2", x: 350, y: 200, type: "zonaCarga", latitude: 4.6278, longitude: -74.0723 },
-  {id: "6",label: "Distribución Central",x: 250,y: 150,type: "distribucion",latitude: 4.6201,longitude: -74.0701,},
-]
+  { id: "1", label: "Bodega A", x: 50, y: 300, type: "bodega", latitude: 4.6097, longitude: -74.0817 },
+  { id: "2", label: "Bodega B", x: 450, y: 300, type: "bodega", latitude: 4.6234, longitude: -74.0836 },
+  { id: "3", label: "Bodega C", x: 250, y: 350, type: "bodega", latitude: 4.6145, longitude: -74.0648 },
+  { id: "4", label: "Zona Carga 1", x: 150, y: 50, type: "zonaCarga", latitude: 4.6189, longitude: -74.0756 },
+  { id: "5", label: "Zona Carga 2", x: 350, y: 50, type: "zonaCarga", latitude: 4.6278, longitude: -74.0723 },
+  { id: "6", label: "Distribución Central", x: 250, y: 150, type: "distribucion", latitude: 4.6201, longitude: -74.0701 },
+];
+
 // Crear un grafo no dirigido (bidireccional)
 const mockEdges: Edge[] = [
-  { from: "1", to: "4", condition: "!lluvia && permisoCarga", distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
-  { from: "4", to: "2", condition: "!traficoAlto || !horasPico", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+
+// zonas de carga a distribucion central
+  { from: "5", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "4", to: "6", condition: "true", distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
+// Distribuccion central a bodegas(a,b,c)
+  {from: "6", to: "1",condition: "true",distance: 3,estimatedTime: 10,trafficFactor: 1.0},
+  {from: "6", to: "2",condition: "true",distance: 8,estimatedTime: 25,trafficFactor: 1.2},
+  {from: "6", to: "3", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+//distribuccionn entre bodegas
+  { from: "1", to: "2", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "1", to: "3", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "2", to: "1", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "2", to: "3", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "1", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "2", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+// bodegas a zona de cargas
+  { from: "1", to: "4", condition: "!mantenimiento || !horasPico", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "1", to: "5", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "2", to: "4", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "2", to: "5", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "4", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "5", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  /*{ from: "4", to: "2", condition: "!mantenimiento || !horasPico", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "1", to: "6", condition: "true", distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
   { from: "6", to: "2", condition: "!mantenimiento", distance: 4, estimatedTime: 12, trafficFactor: 1.0 },
   { from: "2", to: "5", condition: "permisoCarga && !lluvia", distance: 6, estimatedTime: 18, trafficFactor: 1.1 },
@@ -25,35 +49,15 @@ const mockEdges: Edge[] = [
   {from: "3",to: "1",condition: "!mantenimiento && !horasPico",distance: 12,estimatedTime: 35,trafficFactor: 1.2,},
   { from: "6", to: "3", condition: "!lluvia || !traficoAlto", distance: 9, estimatedTime: 28, trafficFactor: 1.1 },
   { from: "4", to: "5", condition: "true", distance: 7, estimatedTime: 21, trafficFactor: 1.2 },
-  { from: "5", to: "4", condition: "true", distance: 7, estimatedTime: 21, trafficFactor: 1.2 },
-  { from: "1", to: "2", condition: "true", distance: 10, estimatedTime: 30, trafficFactor: 1.1 },
+  
+  
   { from: "2", to: "1", condition: "true", distance: 10, estimatedTime: 30, trafficFactor: 1.1 },
-  { from: "4", to: "6", condition: "true", distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
-  { from: "6", to: "4", condition: "true", distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
-  { from: "5", to: "6", condition: "true", distance: 6, estimatedTime: 18, trafficFactor: 1.0 },
+  { from: "6", to: "4", condition: "true", distance: 5, estimatedTime: 15, trafficFactor: 1.0 }, 
   { from: "6", to: "5", condition: "true", distance: 6, estimatedTime: 18, trafficFactor: 1.0 },
-  { from: "2", to: "3", condition: "true", distance: 8, estimatedTime: 24, trafficFactor: 1.1 },
-  { from: "3", to: "2", condition: "true", distance: 8, estimatedTime: 24, trafficFactor: 1.1 },
+  { from: "3", to: "2", condition: "true", distance: 8, estimatedTime: 24, trafficFactor: 1.1 },*/
 ]
 
-const bidirectionalEdges = [];
-    mockEdges.forEach(edge => {
-      // Añadir arista original
-      bidirectionalEdges.push({...edge});
-      
-      // Añadir arista en dirección inversa si no existe ya
-      const reverseExists = mockEdges.some(e => e.from === edge.to && e.to === edge.from);
-      if (!reverseExists) {
-        bidirectionalEdges.push({
-          from: edge.to,
-          to: edge.from,
-          condition: edge.condition,
-          distance: edge.distance,
-          estimatedTime: edge.estimatedTime,
-          trafficFactor: edge.trafficFactor
-        });
-      }
-    });
+
 
 const mockConditions: Condition[] = [
   { key: "lluvia", label: "Lluvia", description: "Condiciones climáticas desfavorables", icon: "🌧️", active: false },
