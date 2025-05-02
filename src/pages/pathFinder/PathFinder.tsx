@@ -1,9 +1,11 @@
-import { useState } from "react"
+"use client"
+
+import { useState, useEffect } from "react"
 import type { PathResult } from "../../services"
 import { calculateRoute } from "../../services/api"
-import { Props } from "./interface"
+import type { Props } from "./interface"
 
-const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
+const PathFinder = ({ nodes, vehicles, algorithms, onPathResult, currentResult }: Props) => {
   const [startNode, setStartNode] = useState<string>("1")
   const [endNode, setEndNode] = useState<string>("3")
   const [selectedVehicle, setSelectedVehicle] = useState<number | undefined>(undefined)
@@ -12,17 +14,46 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
   const [pathResult, setPathResult] = useState<PathResult | null>(null)
   const [isCalculating, setIsCalculating] = useState<boolean>(false)
 
+  // Actualizar el resultado local cuando cambia el resultado actual
+  useEffect(() => {
+    if (currentResult) {
+      setPathResult(currentResult)
+    }
+  }, [currentResult])
+
   const handleCalculate = async () => {
     setIsCalculating(true)
     try {
+      // Calcular una única ruta
       const result = await calculateRoute(startNode, endNode, selectedAlgorithm, optimizeFor, selectedVehicle)
 
-      setPathResult(result)
-      onPathResult(result)
+      if (!result) {
+        console.error("No se pudo calcular la ruta")
+        setPathResult(null)
+        onPathResult(null, null)
+        return
+      }
+
+      // Asegurarse de que distance siempre sea un número
+      const safeResult: PathResult = {
+        path: result.path || [],
+        distance: typeof result.distance === "number" ? result.distance : 0,
+        estimatedTime: result.estimatedTime,
+        vehicleId: result.vehicleId,
+      }
+
+      setPathResult(safeResult)
+      onPathResult(safeResult, {
+        startNode,
+        endNode,
+        algorithm: selectedAlgorithm,
+        optimizeFor,
+        vehicleId: selectedVehicle,
+      })
     } catch (error) {
       console.error("Error calculating route:", error)
       setPathResult(null)
-      onPathResult(null)
+      onPathResult(null, null)
     } finally {
       setIsCalculating(false)
     }
@@ -41,6 +72,13 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
     return vehicle ? vehicle.name : `Vehículo ${id}`
   }
 
+  // Función para intercambiar origen y destino
+  const swapStartAndEnd = () => {
+    const temp = startNode
+    setStartNode(endNode)
+    setEndNode(temp)
+  }
+
   return (
     <div className="path-finder">
       <h2>Calculador de Rutas</h2>
@@ -56,6 +94,12 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="selector-swap">
+          <button className="swap-button" onClick={swapStartAndEnd} title="Intercambiar origen y destino">
+            ↔️
+          </button>
         </div>
 
         <div className="selector-group">
@@ -119,7 +163,7 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
                 type="radio"
                 name="optimize"
                 value="time"
-                checked={optimizeFor === "time"} 
+                checked={optimizeFor === "time"}
                 onChange={() => setOptimizeFor("time")}
               />
               Tiempo
@@ -128,9 +172,11 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
         </div>
       </div>
 
-      <button className="calculate-button" onClick={handleCalculate} disabled={isCalculating}>
-        {isCalculating ? "Calculando..." : "Calcular Ruta"}
-      </button>
+      <div className="route-buttons">
+        <button className="calculate-button" onClick={handleCalculate} disabled={isCalculating}>
+          {isCalculating ? "Calculando..." : "Calcular Ruta"}
+        </button>
+      </div>
 
       {pathResult && (
         <div className="path-result">
