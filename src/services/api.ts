@@ -34,27 +34,24 @@ const mockEdges: Edge[] = [
   { from: "2", to: "3", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "3", to: "1", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "3", to: "2", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-// bodegas a zona de cargas
+// bodegas a distribucion central
   { from: "1", to: "6", condition: "!mantenimiento || !horasPico", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "1", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "2", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "2", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "3", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "3", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+// distribucion central a zona de cargas
+  { from: "6", to: "4", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "6", to: "5", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   /*{ from: "4", to: "2", condition: "!mantenimiento || !horasPico", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "1", to: "6", condition: "true", distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
   { from: "6", to: "2", condition: "!mantenimiento", distance: 4, estimatedTime: 12, trafficFactor: 1.0 },
   { from: "2", to: "5", condition: "permisoCarga && !lluvia", distance: 6, estimatedTime: 18, trafficFactor: 1.1 },
   { from: "5", to: "3", condition: "!traficoAlto", distance: 7, estimatedTime: 20, trafficFactor: 1.3 },
   {from: "3",to: "1",condition: "!mantenimiento && !horasPico",distance: 12,estimatedTime: 35,trafficFactor: 1.2,},
   { from: "6", to: "3", condition: "!lluvia || !traficoAlto", distance: 9, estimatedTime: 28, trafficFactor: 1.1 },
   { from: "4", to: "5", condition: "true", distance: 7, estimatedTime: 21, trafficFactor: 1.2 },
-  
-  
-  { from: "2", to: "1", condition: "true", distance: 10, estimatedTime: 30, trafficFactor: 1.1 },
-  { from: "6", to: "4", condition: "true", distance: 5, estimatedTime: 15, trafficFactor: 1.0 }, 
-  { from: "6", to: "5", condition: "true", distance: 6, estimatedTime: 18, trafficFactor: 1.0 },
-  { from: "3", to: "2", condition: "true", distance: 8, estimatedTime: 24, trafficFactor: 1.1 },*/
+  */
 ]
 
 
