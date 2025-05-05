@@ -3,7 +3,14 @@ import Graph from "./pages/graph/Graph"
 import ControlPanel from "./pages/controlPanel/ControlPanel"
 import PathFinder from "./pages/pathFinder/PathFinder"
 import RouteHistory from "./pages/routeHistory/RouteHistory"
-import { getNodes, getEdges, getConditions, getVehicles, getAvailableAlgorithms } from "./services/api"
+import { 
+  getNodes, 
+  getEdges, 
+  getConditions, 
+  getVehicles, 
+  getRouteAlgorithms, // Nueva función para obtener los algoritmos
+  evalCondition 
+} from "./pages/graph/graphData"
 import type {
   NodeData,
   Edge,
@@ -13,8 +20,7 @@ import type {
   Vehicle,
   RouteAlgorithm,
   ConditionKey,
-} from "./services"
-import { evalCondition } from "./services/algorithms"
+} from "./pages/graph/interface"
 import "./App.css"
 
 function App() {
@@ -36,14 +42,14 @@ function App() {
         const edgesData = await getEdges()
         const conditionsData = await getConditions()
         const vehiclesData = await getVehicles()
-        const algorithmsData = getAvailableAlgorithms()
+        const algorithmsData = await getRouteAlgorithms() // Nuevo: cargar algoritmos disponibles
 
         setNodes(nodesData)
         setEdges(edgesData)
         setConditions(conditionsData)
         setVehicles(vehiclesData)
-        setAlgorithms(algorithmsData)
-
+        setAlgorithms(algorithmsData) // Nuevo: establecer algoritmos
+  
         // Inicializar condiciones activas
         const condMap: ConditionMap = {} as ConditionMap
         conditionsData.forEach((cond) => {
@@ -110,7 +116,12 @@ function App() {
           </div>
 
           {activeTab === "pathfinder" ? (
-            <PathFinder nodes={nodes} vehicles={vehicles} algorithms={algorithms} onPathResult={handlePathResult} />
+            <PathFinder 
+              nodes={nodes} 
+              vehicles={vehicles} 
+              algorithms={algorithms} // Ahora pasaremos la lista de algoritmos cargados
+              onPathResult={handlePathResult} 
+            />
           ) : (
             <RouteHistory />
           )}

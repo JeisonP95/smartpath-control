@@ -1,6 +1,7 @@
 import { useState } from "react"
-import type { PathResult } from "../../services"
-import { calculateRoute } from "../../services/api"
+import {calculateRoute } from "../routeCalculator/calculateRoute"
+import { PathResult } from "../graph/interface"
+
 import { Props } from "./interface"
 
 const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
@@ -15,7 +16,7 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
   const handleCalculate = async () => {
     setIsCalculating(true)
     try {
-      const result = await calculateRoute(startNode, endNode, selectedAlgorithm, optimizeFor, selectedVehicle)
+      const result = await calculateRoute(startNode, endNode, optimizeFor, selectedVehicle)
 
       setPathResult(result)
       onPathResult(result)

@@ -1,6 +1,6 @@
 import { useState } from "react"
-import type { ConditionKey } from "../../services"
-import { updateCondition } from "../../services/api"
+import type { ConditionKey } from "../graph/interface"
+import { updateCondition } from "../graph/graphData"
 import { Props } from "./interface"
 import { Leaf } from "../../components/icons/icons"
 

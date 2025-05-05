@@ -1,5 +1,3 @@
-"use client"
-
 import { useCallback, useState } from "react"
 import ReactFlow, {
   Background,
@@ -13,7 +11,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css"
 import type { Props } from "./interface"
 import { nodeTypes } from "./graph.data"
-import { calculateDistance } from "../../services/distancia"
+import { calculateDistance } from "../../utils/distancia"
 
 const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas" }: Props) => {
   // Convertir nodos a formato ReactFlow
@@ -68,7 +66,13 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
         const sourceType = nodes.find((n) => n.id === edge.from)?.type
         const targetType = nodes.find((n) => n.id === edge.to)?.type
 
-        if (sourceType === "bodega" || targetType === "bodega") {
+        if (
+          ["bodega", "zonaCarga", "distribucion"].includes(sourceType || "") ||
+          ["bodega", "zonaCarga", "distribucion"].includes(targetType || "")
+        ){
+        
+
+        
           // Calcular nueva distancia basada en las posiciones actuales
           distance = calculateDistance(
             sourceNode.position.x,
@@ -76,6 +80,7 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
             targetNode.position.x,
             targetNode.position.y,
           )
+
 
           // Actualizar tiempo estimado basado en la nueva distancia
           // Asumiendo que la velocidad es constante
@@ -133,7 +138,11 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
               const sourceType = nodes.find((n) => n.id === edge.from)?.type
               const targetType = nodes.find((n) => n.id === edge.to)?.type
 
-              if (sourceType === "bodega" || targetType === "bodega") {
+              if (
+                ["bodega", "zonaCarga", "distribucion"].includes(sourceType || "") ||
+                ["bodega", "zonaCarga", "distribucion"].includes(targetType || "")
+              ) {
+              
                 // Calcular nueva distancia basada en las posiciones actuales
                 distance = calculateDistance(
                   sourceNode.position.x,

@@ -1,4 +1,3 @@
-
 /* Calcula la distancia entre dos puntos en el plano y la convierte a una distancia en kilómetros */
 export function calculateDistance(x1: number, y1: number, x2: number, y2: number): number {
     // Calcular distancia 
