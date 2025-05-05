@@ -1,6 +1,4 @@
-import { getConditions, getVehicles } from "../graph/components/graph.algorimths";
-import { calculateDistance } from "../../utils/distancia";
-import { evalCondition } from "../graph/components/graph.algorimths";
+import { getConditions } from "../graph/components/graph.algorimths";
 import { findShortestPathAStar } from "../../utils/astar";  // Función para calcular ruta usando A*
 import { PathResult, NodeData, Edge } from "../graph/utils/interface";
 import { createServerSupabaseClient } from "../../services/supabase";
@@ -33,16 +31,6 @@ export async function calculateRoute(
   nodes.forEach((node) => {
     nodesMap[node.id] = { x: node.x, y: node.y };
   });
-
-  // Obtener vehículo si se especificó
-  let vehicleSpeedFactor = 1.0;
-  if (vehicleId) {
-    const vehicles = await getVehicles();
-    const vehicle = vehicles.find((v) => v.id === vehicleId);
-    if (vehicle) {
-      vehicleSpeedFactor = vehicle.speedFactor;
-    }
-  }
 
   // Calcular ruta usando A*
   const result: PathResult | null = findShortestPathAStar(
@@ -80,38 +68,3 @@ export async function calculateRoute(
   return result;
 }
 
-// Función auxiliar para encontrar la ruta (implementación simplificada de A*)
-function findPath(
-  start: string,
-  end: string,
-  edges: any[],
-  optimizeFor: "distance" | "time"
-): string[] {
-  // Implementación básica de búsqueda de ruta
-  // Aquí deberías implementar tu algoritmo de ruta preferido (A*, Dijkstra, etc.)
-  const visited = new Set<string>();
-  const queue: { node: string; path: string[] }[] = [{ node: start, path: [start] }];
-  
-  while (queue.length > 0) {
-    const { node, path } = queue.shift()!;
-    
-    if (node === end) {
-      return path;
-    }
-    
-    if (visited.has(node)) continue;
-    visited.add(node);
-    
-    const neighbors = edges
-      .filter(e => e.from === node)
-      .map(e => e.to);
-      
-    for (const neighbor of neighbors) {
-      if (!visited.has(neighbor)) {
-        queue.push({ node: neighbor, path: [...path, neighbor] });
-      }
-    }
-  }
-  
-  return [];
-}
