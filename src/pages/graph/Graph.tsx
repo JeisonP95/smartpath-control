@@ -12,8 +12,11 @@ import "reactflow/dist/style.css"
 import type { Props } from "./utils/interface"
 import { nodeTypes } from "./components/graph.data"
 import { calculateDistance } from "../../utils/distancia"
+import { useGraph } from "../../context/GraphContext"
 
 const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas" }: Props) => {
+  const { updateNodePosition } = useGraph();
+  
   // Convertir nodos a formato ReactFlow
   const initialNodes: ReactFlowNode[] = nodes.map((node) => ({
     id: node.id,
@@ -112,6 +115,12 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
         )
 
         if (positionChanges.length > 0) {
+          positionChanges.forEach(change => {
+            const node = newNodes.find(n => n.id === change.id)
+            if (node) {
+              updateNodePosition(change.id, node.position.x, node.position.y)
+            }
+          })
           const updatedEdges = calculateUpdatedEdges(newNodes)
           setReactFlowEdges(updatedEdges)
         }
@@ -119,7 +128,7 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
         return newNodes
       })
     },
-    [calculateUpdatedEdges],
+    [calculateUpdatedEdges, updateNodePosition],
   )
 
   return (

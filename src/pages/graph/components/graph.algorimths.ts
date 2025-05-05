@@ -3,53 +3,11 @@ import { calculateDistance } from "../../../utils/distancia"
 import { Edge, NodeData, Vehicle, RouteAlgorithm, Condition, ConditionMap, ConditionKey} from "../utils/interface"
 import { mockNodes, mockEdges, mockConditions, mockVehicles, mockAlgorithms } from "./graph.data"
 
-
-// Función para recalcular las distancias y tiempos de las aristas
-function updateEdgesWithNewDistances(edges: Edge[], nodes: { id: string, x: number, y: number }[]): Edge[] {
-  // Crear un mapa de nodos para acceso rápido
-  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
-
-  return edges.map((edge) => {
-    const sourceNode = nodeMap.get(edge.from);
-    const targetNode = nodeMap.get(edge.to);
-
-    if (!sourceNode || !targetNode) return edge; // Si alguno de los nodos no existe, no hacer nada
-
-    // Calcular la distancia entre los nodos utilizando calculateDistance
-    const distance = calculateDistance(
-      sourceNode.x,
-      sourceNode.y,
-      targetNode.x,
-      targetNode.y,
-    );
-
-    // Recalcular el tiempo estimado en función de la distancia calculada
-    let estimatedTime = edge.estimatedTime;
-    if (edge.estimatedTime && edge.distance) {
-      const speedFactor = edge.estimatedTime / edge.distance;  // Factor de velocidad
-      estimatedTime = distance * speedFactor;
-    }
-
-    // Retornar la arista actualizada con la nueva distancia y tiempo estimado
-    return {
-      ...edge,
-      distance,
-      estimatedTime,
-    };
-  });
-}
-// Llamada a la función para actualizar las aristas
-const updatedEdges = updateEdgesWithNewDistances(mockEdges, mockNodes);
-
-// Mostrar las aristas actualizadas
-console.log(updatedEdges);
-
 // Verificar si estamos en modo de desarrollo
 const isDevelopment = import.meta.env.DEV;
 
 // Función para evaluar condiciones booleanas
 export function evalCondition(expression: string, values: ConditionMap): boolean {
-  // Si la expresión es "true", siempre devolver true
   if (expression === "true") {
     return true;
   }
@@ -62,6 +20,37 @@ export function evalCondition(expression: string, values: ConditionMap): boolean
   } catch {
     return false;
   }
+}
+
+// Función para recalcular las distancias y tiempos de las aristas
+export function updateEdgesWithNewDistances(edges: Edge[], nodes: NodeData[]): Edge[] {
+  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+
+  return edges.map((edge) => {
+    const sourceNode = nodeMap.get(edge.from);
+    const targetNode = nodeMap.get(edge.to);
+
+    if (!sourceNode || !targetNode) return edge;
+
+    const distance = calculateDistance(
+      sourceNode.x,
+      sourceNode.y,
+      targetNode.x,
+      targetNode.y,
+    );
+
+    let estimatedTime = edge.estimatedTime;
+    if (edge.estimatedTime && edge.distance) {
+      const speedFactor = edge.estimatedTime / edge.distance;
+      estimatedTime = distance * speedFactor;
+    }
+
+    return {
+      ...edge,
+      distance,
+      estimatedTime,
+    };
+  });
 }
 
 // Obtener todos los nodos

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import Graph from "./pages/graph/Graph"
 import ControlPanel from "./pages/controlPanel/ControlPanel"
 import PathFinder from "./pages/pathFinder/PathFinder"
@@ -8,9 +8,10 @@ import {
   getEdges, 
   getConditions, 
   getVehicles, 
-  getRouteAlgorithms, // Nueva función para obtener los algoritmos
+  getRouteAlgorithms,
   evalCondition 
 } from "./pages/graph/components/graph.algorimths"
+import { GraphProvider, useGraph } from "./context/GraphContext"
 import type {
   NodeData,
   Edge,
@@ -23,13 +24,22 @@ import type {
 } from "./pages/graph/utils/interface"
 import "./App.css"
 
-function App() {
-  const [nodes, setNodes] = useState<NodeData[]>([])
-  const [edges, setEdges] = useState<Edge[]>([])
-  const [conditions, setConditions] = useState<Condition[]>([])
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
-  const [algorithms, setAlgorithms] = useState<RouteAlgorithm[]>([])
-  const [activeConditions, setActiveConditions] = useState<ConditionMap>({} as ConditionMap)
+function AppContent() {
+  const { 
+    nodes, 
+    edges, 
+    conditions, 
+    vehicles, 
+    algorithms, 
+    activeConditions,
+    setNodes, 
+    setEdges, 
+    setConditions, 
+    setVehicles, 
+    setAlgorithms, 
+    setActiveConditions 
+  } = useGraph()
+
   const [selectedPath, setSelectedPath] = useState<string[] | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [activeTab, setActiveTab] = useState<"pathfinder" | "history">("pathfinder")
@@ -37,20 +47,18 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Cargar datos
         const nodesData = await getNodes()
         const edgesData = await getEdges()
         const conditionsData = await getConditions()
         const vehiclesData = await getVehicles()
-        const algorithmsData = await getRouteAlgorithms() // Nuevo: cargar algoritmos disponibles
+        const algorithmsData = await getRouteAlgorithms()
 
         setNodes(nodesData)
         setEdges(edgesData)
         setConditions(conditionsData)
         setVehicles(vehiclesData)
-        setAlgorithms(algorithmsData) // Nuevo: establecer algoritmos
+        setAlgorithms(algorithmsData)
   
-        // Inicializar condiciones activas
         const condMap: ConditionMap = {} as ConditionMap
         conditionsData.forEach((cond) => {
           condMap[cond.key] = cond.active
@@ -66,13 +74,11 @@ function App() {
     fetchData()
   }, [])
 
-  // Corregido: Especificamos el tipo correcto para key
   const handleConditionChange = (key: ConditionKey) => {
-    setActiveConditions((prev) => ({
+    setActiveConditions((prev: ConditionMap) => ({
       ...prev,
       [key]: !prev[key],
     }))
-    // Reset path when conditions change
     setSelectedPath(null)
   }
 
@@ -84,7 +90,6 @@ function App() {
     return <div className="loading-app">Cargando aplicación...</div>
   }
 
-  // Filtrar aristas activas basadas en condiciones actuales
   const activeEdges = edges.filter((edge) => evalCondition(edge.condition, activeConditions))
 
   return (
@@ -98,7 +103,11 @@ function App() {
 
       <div className="app-content">
         <aside className="app-sidebar">
-          <ControlPanel conditions={conditions} activeConditions={activeConditions} toggle={handleConditionChange} />
+          <ControlPanel 
+            conditions={conditions} 
+            activeConditions={activeConditions} 
+            toggle={handleConditionChange} 
+          />
 
           <div className="tab-navigation">
             <button
@@ -117,9 +126,6 @@ function App() {
 
           {activeTab === "pathfinder" ? (
             <PathFinder 
-              nodes={nodes} 
-              vehicles={vehicles} 
-              algorithms={algorithms} // Ahora pasaremos la lista de algoritmos cargados
               onPathResult={handlePathResult} 
             />
           ) : (
@@ -128,10 +134,22 @@ function App() {
         </aside>
 
         <main className="app-main">
-          <Graph nodes={nodes} edges={activeEdges} highlightedPath={selectedPath} />
+          <Graph 
+            nodes={nodes} 
+            edges={activeEdges} 
+            highlightedPath={selectedPath} 
+          />
         </main>
       </div>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <GraphProvider>
+      <AppContent />
+    </GraphProvider>
   )
 }
 

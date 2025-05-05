@@ -1,10 +1,10 @@
 import { useState } from "react"
-import {calculateRoute } from "../routeCalculator/calculateRoute"
+import { calculateRoute } from "../routeCalculator/calculateRoute"
 import { PathResult } from "../graph/utils/interface"
+import { useGraph } from "../../context/GraphContext"
 
-import { Props } from "./interface"
-
-const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
+const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null) => void }) => {
+  const { nodes, vehicles, algorithms, edges } = useGraph();
   const [startNode, setStartNode] = useState<string>("1")
   const [endNode, setEndNode] = useState<string>("3")
   const [selectedVehicle, setSelectedVehicle] = useState<number | undefined>(undefined)
@@ -16,10 +16,22 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult }: Props) => {
   const handleCalculate = async () => {
     setIsCalculating(true)
     try {
-      const result = await calculateRoute(startNode, endNode, optimizeFor, selectedVehicle)
-
-      setPathResult(result)
-      onPathResult(result)
+      const result = await calculateRoute(
+        startNode, 
+        endNode, 
+        optimizeFor, 
+        selectedVehicle,
+        nodes,
+        edges
+      )
+      if (result) {
+        setPathResult(result)
+        onPathResult(result)
+      } else {
+        setPathResult(null)
+        onPathResult(null)
+        console.error("No se encontró una ruta válida")
+      }
     } catch (error) {
       console.error("Error calculating route:", error)
       setPathResult(null)

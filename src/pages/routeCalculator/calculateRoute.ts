@@ -1,23 +1,26 @@
-import { getConditions, getEdges, getNodes, getVehicles } from "../graph/components/graph.algorimths";
+import { getConditions, getVehicles } from "../graph/components/graph.algorimths";
 import { calculateDistance } from "../../utils/distancia";
 import { evalCondition } from "../graph/components/graph.algorimths";
 import { findShortestPathAStar } from "../../utils/astar";  // Función para calcular ruta usando A*
-import { PathResult } from "../graph/utils/interface";
+import { PathResult, NodeData, Edge } from "../graph/utils/interface";
 import { createServerSupabaseClient } from "../../services/supabase";
 import { ConditionMap } from "../graph/utils/interface";
-
-
+import { updateEdgesWithNewDistances } from "../graph/components/graph.algorimths";
 
 const isDevelopment = import.meta.env.DEV;
 
-
 // Calcular ruta
 export async function calculateRoute(
-  start: string,
-  end: string,
-  optimizeFor: "distance" | "time" = "distance",
-  vehicleId?: number,
+  startNode: string,
+  endNode: string,
+  optimizeFor: "distance" | "time",
+  vehicleId: number | undefined,
+  nodes: NodeData[],
+  edges: Edge[]
 ): Promise<PathResult | null> {
+  // Actualizar las aristas con las nuevas posiciones de los nodos
+  const updatedEdges = updateEdgesWithNewDistances(edges, nodes);
+  
   // Obtener condiciones actuales
   const conditionsData = await getConditions();
   const conditions: ConditionMap = {} as any;
@@ -25,47 +28,11 @@ export async function calculateRoute(
     conditions[c.key] = c.active;
   });
 
-  // Obtener aristas y nodos
-  const edges = await getEdges();
-  const nodes = await getNodes();
-
   // Crear un mapa de nodos para acceso rápido
   const nodesMap: Record<string, { x: number; y: number }> = {};
   nodes.forEach((node) => {
     nodesMap[node.id] = { x: node.x, y: node.y };
   });
-
-  // Recalcular distancias de aristas basadas en las posiciones de los nodos
-  const edgesWithUpdatedDistances = edges.map(edge => {
-    const sourceNode = nodes.find(n => n.id === edge.from);
-    const targetNode = nodes.find(n => n.id === edge.to);
-    
-    if (sourceNode && targetNode) {
-      // Usar la función calculateDistance para calcular la distancia real
-      const calculatedDistance = calculateDistance(
-        sourceNode.x,
-        sourceNode.y,
-        targetNode.x,
-        targetNode.y
-      );
-      
-      // Actualizar el tiempo estimado basado en la nueva distancia
-      const estimatedTime = edge.estimatedTime ? 
-        (calculatedDistance / edge.distance) * edge.estimatedTime : 
-        calculatedDistance * 3; // Default: 3 minutos por kilómetro
-      
-      return {
-        ...edge,
-        distance: calculatedDistance,
-        estimatedTime: estimatedTime
-      };
-    }
-    
-    return edge;
-  });
-
-  // Filtrar aristas activas según condiciones
-  const activeEdges = edgesWithUpdatedDistances.filter((edge) => evalCondition(edge.condition, conditions));
 
   // Obtener vehículo si se especificó
   let vehicleSpeedFactor = 1.0;
@@ -77,33 +44,23 @@ export async function calculateRoute(
     }
   }
 
-  // Ajustar tiempos estimados según el vehículo
-  const adjustedEdges = activeEdges.map((edge) => ({
-    ...edge,
-    estimatedTime: (edge.estimatedTime || edge.distance * 3) / vehicleSpeedFactor,
-  }));
-
-
-
   // Calcular ruta usando A*
   const result: PathResult | null = findShortestPathAStar(
-    start,
-    end,
-    adjustedEdges,
+    startNode,
+    endNode,
+    updatedEdges,
     nodesMap,
-    conditions,       // <== Faltaba
-    optimizeFor,      // <== Ya lo tenías
-    vehicleId ?? 0    // <== Faltaba. Asegúrate de pasar un número (puedes usar 0 como valor por defecto si no se define)
+    conditions,
+    optimizeFor,
+    vehicleId ?? 0
   );
   
-
-  // Si se encontró una ruta y no estamos en desarrollo, guardarla en el historial
   if (result && !isDevelopment) {
     try {
       const supabase = createServerSupabaseClient();
       await supabase.from("routes").insert({
-        start_node: start,
-        end_node: end,
+        start_node: startNode,
+        end_node: endNode,
         path: JSON.stringify(result.path),
         distance: result.distance,
         estimated_time: result.estimatedTime,
@@ -121,4 +78,40 @@ export async function calculateRoute(
   }
 
   return result;
+}
+
+// Función auxiliar para encontrar la ruta (implementación simplificada de A*)
+function findPath(
+  start: string,
+  end: string,
+  edges: any[],
+  optimizeFor: "distance" | "time"
+): string[] {
+  // Implementación básica de búsqueda de ruta
+  // Aquí deberías implementar tu algoritmo de ruta preferido (A*, Dijkstra, etc.)
+  const visited = new Set<string>();
+  const queue: { node: string; path: string[] }[] = [{ node: start, path: [start] }];
+  
+  while (queue.length > 0) {
+    const { node, path } = queue.shift()!;
+    
+    if (node === end) {
+      return path;
+    }
+    
+    if (visited.has(node)) continue;
+    visited.add(node);
+    
+    const neighbors = edges
+      .filter(e => e.from === node)
+      .map(e => e.to);
+      
+    for (const neighbor of neighbors) {
+      if (!visited.has(neighbor)) {
+        queue.push({ node: neighbor, path: [...path, neighbor] });
+      }
+    }
+  }
+  
+  return [];
 }
