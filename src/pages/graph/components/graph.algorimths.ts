@@ -1,7 +1,7 @@
-import { createServerSupabaseClient } from "../../services/supabase"
-import { calculateDistance } from "../../utils/distancia"
-import { Edge, NodeData, Vehicle, RouteAlgorithm, Condition} from "./interface"
-import { mockNodes, mockEdges, mockConditions, mockVehicles, mockAlgorithms } from "../../pages/graph/graph.data"
+import { createServerSupabaseClient } from "../../../services/supabase"
+import { calculateDistance } from "../../../utils/distancia"
+import { Edge, NodeData, Vehicle, RouteAlgorithm, Condition, ConditionMap, ConditionKey} from "../utils/interface"
+import { mockNodes, mockEdges, mockConditions, mockVehicles, mockAlgorithms } from "./graph.data"
 
 
 // Función para recalcular las distancias y tiempos de las aristas

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useState, useEffect } from "react"
 import ReactFlow, {
   Background,
   Controls,
@@ -9,8 +9,8 @@ import ReactFlow, {
   type NodePositionChange,
 } from "reactflow"
 import "reactflow/dist/style.css"
-import type { Props } from "./interface"
-import { nodeTypes } from "./graph.data"
+import type { Props } from "./utils/interface"
+import { nodeTypes } from "./components/graph.data"
 import { calculateDistance } from "../../utils/distancia"
 
 const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas" }: Props) => {
@@ -45,162 +45,82 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
     [highlightedPath],
   )
 
-  // Actualizar aristas cuando cambian los nodos o las aristas originales
-  useCallback(() => {
-    // Crear un mapa de nodos para acceso rápido
-    const nodeMap = new Map(reactFlowNodes.map((node) => [node.id, node]))
+  // Función para calcular las aristas actualizadas
+  const calculateUpdatedEdges = useCallback(
+    (currentNodes: ReactFlowNode[]) => {
+      const nodeMap = new Map(currentNodes.map((node) => [node.id, node]))
 
-    // Crear aristas para reactflow con distancias recalculadas
-    const updatedEdges: ReactFlowEdge[] = edges.map((edge, index) => {
-      const isInPath = isEdgeInPath(edge.from, edge.to)
+      return edges.map((edge, index) => {
+        const isInPath = isEdgeInPath(edge.from, edge.to)
+        const sourceNode = nodeMap.get(edge.from)
+        const targetNode = nodeMap.get(edge.to)
 
-      // Obtener posiciones actuales de los nodos
-      const sourceNode = nodeMap.get(edge.from)
-      const targetNode = nodeMap.get(edge.to)
+        let distance = edge.distance
+        let estimatedTime = edge.estimatedTime
 
-      let distance = edge.distance
-      let estimatedTime = edge.estimatedTime
+        if (sourceNode && targetNode) {
+          const sourceType = nodes.find((n) => n.id === edge.from)?.type
+          const targetType = nodes.find((n) => n.id === edge.to)?.type
 
-      // Recalcular distancia si ambos nodos existen y al menos uno es una bodega
-      if (sourceNode && targetNode) {
-        const sourceType = nodes.find((n) => n.id === edge.from)?.type
-        const targetType = nodes.find((n) => n.id === edge.to)?.type
+          if (
+            ["bodega", "zonaCarga", "distribucion"].includes(sourceType || "") ||
+            ["bodega", "zonaCarga", "distribucion"].includes(targetType || "")
+          ) {
+            distance = calculateDistance(
+              sourceNode.position.x,
+              sourceNode.position.y,
+              targetNode.position.x,
+              targetNode.position.y,
+            )
 
-        if (
-          ["bodega", "zonaCarga", "distribucion"].includes(sourceType || "") ||
-          ["bodega", "zonaCarga", "distribucion"].includes(targetType || "")
-        ){
-        
-
-        
-          // Calcular nueva distancia basada en las posiciones actuales
-          distance = calculateDistance(
-            sourceNode.position.x,
-            sourceNode.position.y,
-            targetNode.position.x,
-            targetNode.position.y,
-          )
-
-
-          // Actualizar tiempo estimado basado en la nueva distancia
-          // Asumiendo que la velocidad es constante
-          if (edge.estimatedTime) {
-            const speedFactor = edge.estimatedTime / edge.distance
-            estimatedTime = distance * speedFactor
+            if (edge.estimatedTime) {
+              const speedFactor = edge.estimatedTime / edge.distance
+              estimatedTime = distance * speedFactor
+            }
           }
         }
-      }
 
-      return {
-        id: `e${index}`,
-        source: edge.from,
-        target: edge.to,
-        animated: isInPath,
-        label: `${distance.toFixed(1)} km${estimatedTime ? ` / ${Math.floor(estimatedTime)} min` : ""}`,
-        style: {
-          stroke: isInPath ? "#ffcc00" : "#00cc44",
-          strokeWidth: isInPath ? 3 : 1.5,
-        },
-      }
-    })
+        return {
+          id: `e${index}`,
+          source: edge.from,
+          target: edge.to,
+          animated: isInPath,
+          label: `${distance.toFixed(1)} km${estimatedTime ? ` / ${Math.floor(estimatedTime)} min` : ""}`,
+          style: {
+            stroke: isInPath ? "#ffcc00" : "#00cc44",
+            strokeWidth: isInPath ? 3 : 1.5,
+          },
+        }
+      })
+    },
+    [edges, isEdgeInPath, nodes],
+  )
 
+  // Actualizar aristas cuando cambian los nodos o las aristas originales
+  useEffect(() => {
+    const updatedEdges = calculateUpdatedEdges(reactFlowNodes)
     setReactFlowEdges(updatedEdges)
-  }, [reactFlowNodes, edges, isEdgeInPath, nodes])
+  }, [reactFlowNodes, calculateUpdatedEdges])
 
   // Manejar cambios en los nodos (drag and drop)
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
       setReactFlowNodes((nds) => {
         const newNodes = applyNodeChanges(changes, nds)
-
-        // Si el cambio es de posición, actualizar las aristas
         const positionChanges = changes.filter(
           (change): change is NodePositionChange => change.type === "position" && change.dragging === false,
         )
 
         if (positionChanges.length > 0) {
-          // Crear un mapa de nodos para acceso rápido
-          const nodeMap = new Map(newNodes.map((node) => [node.id, node]))
-
-          // Actualizar aristas con nuevas distancias
-          const updatedEdges = edges.map((edge, index) => {
-            const isInPath = isEdgeInPath(edge.from, edge.to)
-
-            // Obtener posiciones actuales de los nodos
-            const sourceNode = nodeMap.get(edge.from)
-            const targetNode = nodeMap.get(edge.to)
-
-            let distance = edge.distance
-            let estimatedTime = edge.estimatedTime
-
-            // Recalcular distancia si ambos nodos existen y al menos uno es una bodega
-            if (sourceNode && targetNode) {
-              const sourceType = nodes.find((n) => n.id === edge.from)?.type
-              const targetType = nodes.find((n) => n.id === edge.to)?.type
-
-              if (
-                ["bodega", "zonaCarga", "distribucion"].includes(sourceType || "") ||
-                ["bodega", "zonaCarga", "distribucion"].includes(targetType || "")
-              ) {
-              
-                // Calcular nueva distancia basada en las posiciones actuales
-                distance = calculateDistance(
-                  sourceNode.position.x,
-                  sourceNode.position.y,
-                  targetNode.position.x,
-                  targetNode.position.y,
-                )
-
-                // Actualizar tiempo estimado basado en la nueva distancia
-                if (edge.estimatedTime) {
-                  const speedFactor = edge.estimatedTime / edge.distance
-                  estimatedTime = distance * speedFactor
-                }
-              }
-            }
-
-            return {
-              id: `e${index}`,
-              source: edge.from,
-              target: edge.to,
-              animated: isInPath,
-              label: `${distance.toFixed(1)} km${estimatedTime ? ` / ${Math.floor(estimatedTime)} min` : ""}`,
-              style: {
-                stroke: isInPath ? "#ffcc00" : "#00cc44",
-                strokeWidth: isInPath ? 3 : 1.5,
-              },
-            }
-          })
-
+          const updatedEdges = calculateUpdatedEdges(newNodes)
           setReactFlowEdges(updatedEdges)
         }
 
         return newNodes
       })
     },
-    [edges, isEdgeInPath, nodes],
+    [calculateUpdatedEdges],
   )
-
-  // Actualizar aristas iniciales
-  useCallback(() => {
-    const initialEdges = edges.map((edge, index) => {
-      const isInPath = isEdgeInPath(edge.from, edge.to)
-
-      return {
-        id: `e${index}`,
-        source: edge.from,
-        target: edge.to,
-        animated: isInPath,
-        label: `${edge.distance.toFixed(1)} km${edge.estimatedTime ? ` / ${Math.floor(edge.estimatedTime)} min` : ""}`,
-        style: {
-          stroke: isInPath ? "#ffcc00" : "#00cc44",
-          strokeWidth: isInPath ? 3 : 1.5,
-        },
-      }
-    })
-
-    setReactFlowEdges(initialEdges)
-  }, [edges, isEdgeInPath])
 
   return (
     <div className="graph-container">

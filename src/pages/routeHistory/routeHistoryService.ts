@@ -1,5 +1,5 @@
 import { createServerSupabaseClient } from "../../services/supabase";
-import { PathResult } from "../graph/interface";
+import { PathResult } from "../graph/utils/interface";
 
 // Guardar una nueva ruta en el historial
 const mockRouteHistory: any[] = [

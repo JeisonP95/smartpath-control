@@ -1,6 +1,6 @@
 import { useState } from "react"
 import {calculateRoute } from "../routeCalculator/calculateRoute"
-import { PathResult } from "../graph/interface"
+import { PathResult } from "../graph/utils/interface"
 
 import { Props } from "./interface"
 

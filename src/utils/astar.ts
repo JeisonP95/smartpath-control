@@ -1,5 +1,5 @@
-import { Edge, PathResult, ConditionMap } from "../pages/graph/interface";
-import { evalCondition } from "../pages/graph/graphData";
+import { Edge, PathResult, ConditionMap } from "../pages/graph/utils/interface";
+import { evalCondition } from "../pages/graph/components/graph.algorimths";
 
 // Función heurística para estimar la distancia entre dos nodos (para A*)
 function heuristic(

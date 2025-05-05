@@ -1,6 +1,6 @@
 import { type NodeTypes, Handle, Position, type NodeProps } from "reactflow"
 import "reactflow/dist/style.css"
-import { Edge, NodeData, Vehicle, RouteAlgorithm, Condition} from "../../pages/graph/interface"
+import { Edge, NodeData, Vehicle, RouteAlgorithm, Condition} from "../utils/interface"
 
 
 // Datos de ejemplo para desarrollo local

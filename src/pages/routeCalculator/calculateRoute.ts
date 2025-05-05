@@ -1,10 +1,10 @@
-import { getConditions, getEdges, getNodes, getVehicles } from "../graph/graphData";
+import { getConditions, getEdges, getNodes, getVehicles } from "../graph/components/graph.algorimths";
 import { calculateDistance } from "../../utils/distancia";
-import { evalCondition } from "../graph/graphData";
+import { evalCondition } from "../graph/components/graph.algorimths";
 import { findShortestPathAStar } from "../../utils/astar";  // Función para calcular ruta usando A*
-import { PathResult } from "../graph/interface";
+import { PathResult } from "../graph/utils/interface";
 import { createServerSupabaseClient } from "../../services/supabase";
-import { ConditionMap } from "../graph/interface";
+import { ConditionMap } from "../graph/utils/interface";
 
 
 

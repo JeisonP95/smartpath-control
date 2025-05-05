@@ -10,7 +10,7 @@ import {
   getVehicles, 
   getRouteAlgorithms, // Nueva función para obtener los algoritmos
   evalCondition 
-} from "./pages/graph/graphData"
+} from "./pages/graph/components/graph.algorimths"
 import type {
   NodeData,
   Edge,
@@ -20,7 +20,7 @@ import type {
   Vehicle,
   RouteAlgorithm,
   ConditionKey,
-} from "./pages/graph/interface"
+} from "./pages/graph/utils/interface"
 import "./App.css"
 
 function App() {
