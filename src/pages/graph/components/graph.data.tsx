@@ -17,11 +17,12 @@ export const mockNodes: NodeData[] = [
 export const mockEdges: Edge[] = [
   // Zonas de carga a distribución central (bidireccionales)
   { from: "4", to: "6", condition: "true", bidirectional: true, distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
+  { from: "6", to: "4", condition: "true", bidirectional: true, distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
   // No necesitamos la ruta inversa si bidirectional es true
   
   // Zona de carga a zona de carga
   { from: "6", to: "5", condition: "true", bidirectional: true, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  
+  { from: "5", to: "6", condition: "true", bidirectional: true, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   // Distribución central a bodegas
   { from: "6", to: "1", condition: "!mantenimiento || !horasPico", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
   { from: "1", to: "6", condition: "true", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
