@@ -22,9 +22,9 @@ const mockEdges: Edge[] = [
 
 // zonas de carga a distribucion central
   { from: "5", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "4", to: "6", condition: "true", distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
-// Distribuccion central a bodegas(a,b,c)
-  {from: "6", to: "1",condition: "true",distance: 3,estimatedTime: 10,trafficFactor: 1.0},
+  { from: "4", to: "6", condition: "true", distance: 5, estimatedTime: 25, trafficFactor: 1.2 },
+  // Distribuccion central a bodegas(a,b,c)
+  {from: "6", to: "1",condition: "true",distance: 8,estimatedTime: 25,trafficFactor: 1.2},
   {from: "6", to: "2",condition: "true",distance: 8,estimatedTime: 25,trafficFactor: 1.2},
   {from: "6", to: "3", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
 //distribuccionn entre bodegas
@@ -34,14 +34,11 @@ const mockEdges: Edge[] = [
   { from: "2", to: "3", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "3", to: "1", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "3", to: "2", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-// bodegas a distribucion central
+  // bodegas a distribucion central
   { from: "1", to: "6", condition: "!mantenimiento || !horasPico", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "1", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "2", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "2", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "3", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "3", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-// distribucion central a zona de cargas
+  // distribucion central a zona de cargas
   { from: "6", to: "4", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "6", to: "5", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   /*{ from: "4", to: "2", condition: "!mantenimiento || !horasPico", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },

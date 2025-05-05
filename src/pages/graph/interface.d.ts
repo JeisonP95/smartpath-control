@@ -3,4 +3,5 @@ export interface Props {
   edges: Edge[]
   highlightedPath?: string[] | null
   title?: string
+  onDistancesChange?: (distances: Map<string, number>) => void
 }
