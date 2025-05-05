@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { getRouteHistory } from "../../services/api"
+import { getRouteHistory } from "../routeHistory/routeHistoryService"
 import { RouteHistoryItem } from "./interface"
 
 

@@ -1,11 +1,10 @@
-"use client"
+import { useState } from "react"
+import { calculateRoute } from "../routeCalculator/calculateRoute"
+import { PathResult } from "../graph/utils/interface"
+import { useGraph } from "../../context/GraphContext"
 
-import { useState, useEffect } from "react"
-import type { PathResult } from "../../services"
-import { calculateRoute } from "../../services/api"
-import type { Props } from "./interface"
-
-const PathFinder = ({ nodes, vehicles, algorithms, onPathResult, currentResult }: Props) => {
+const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null) => void }) => {
+  const { nodes, vehicles, algorithms, edges } = useGraph();
   const [startNode, setStartNode] = useState<string>("1")
   const [endNode, setEndNode] = useState<string>("3")
   const [selectedVehicle, setSelectedVehicle] = useState<number | undefined>(undefined)
@@ -14,46 +13,29 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult, currentResult }
   const [pathResult, setPathResult] = useState<PathResult | null>(null)
   const [isCalculating, setIsCalculating] = useState<boolean>(false)
 
-  // Actualizar el resultado local cuando cambia el resultado actual
-  useEffect(() => {
-    if (currentResult) {
-      setPathResult(currentResult)
-    }
-  }, [currentResult])
-
   const handleCalculate = async () => {
     setIsCalculating(true)
     try {
-      // Calcular una única ruta
-      const result = await calculateRoute(startNode, endNode, selectedAlgorithm, optimizeFor, selectedVehicle)
-
-      if (!result) {
-        console.error("No se pudo calcular la ruta")
+      const result = await calculateRoute(
+        startNode, 
+        endNode, 
+        optimizeFor, 
+        selectedVehicle,
+        nodes,
+        edges
+      )
+      if (result) {
+        setPathResult(result)
+        onPathResult(result)
+      } else {
         setPathResult(null)
-        onPathResult(null, null)
-        return
+        onPathResult(null)
+        console.error("No se encontró una ruta válida")
       }
-
-      // Asegurarse de que distance siempre sea un número
-      const safeResult: PathResult = {
-        path: result.path || [],
-        distance: typeof result.distance === "number" ? result.distance : 0,
-        estimatedTime: result.estimatedTime,
-        vehicleId: result.vehicleId,
-      }
-
-      setPathResult(safeResult)
-      onPathResult(safeResult, {
-        startNode,
-        endNode,
-        algorithm: selectedAlgorithm,
-        optimizeFor,
-        vehicleId: selectedVehicle,
-      })
     } catch (error) {
       console.error("Error calculating route:", error)
       setPathResult(null)
-      onPathResult(null, null)
+      onPathResult(null)
     } finally {
       setIsCalculating(false)
     }
@@ -72,13 +54,6 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult, currentResult }
     return vehicle ? vehicle.name : `Vehículo ${id}`
   }
 
-  // Función para intercambiar origen y destino
-  const swapStartAndEnd = () => {
-    const temp = startNode
-    setStartNode(endNode)
-    setEndNode(temp)
-  }
-
   return (
     <div className="path-finder">
       <h2>Calculador de Rutas</h2>
@@ -94,12 +69,6 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult, currentResult }
               </option>
             ))}
           </select>
-        </div>
-
-        <div className="selector-swap">
-          <button className="swap-button" onClick={swapStartAndEnd} title="Intercambiar origen y destino">
-            ↔️
-          </button>
         </div>
 
         <div className="selector-group">
@@ -163,7 +132,7 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult, currentResult }
                 type="radio"
                 name="optimize"
                 value="time"
-                checked={optimizeFor === "time"}
+                checked={optimizeFor === "time"} 
                 onChange={() => setOptimizeFor("time")}
               />
               Tiempo
@@ -172,11 +141,9 @@ const PathFinder = ({ nodes, vehicles, algorithms, onPathResult, currentResult }
         </div>
       </div>
 
-      <div className="route-buttons">
-        <button className="calculate-button" onClick={handleCalculate} disabled={isCalculating}>
-          {isCalculating ? "Calculando..." : "Calcular Ruta"}
-        </button>
-      </div>
+      <button className="calculate-button" onClick={handleCalculate} disabled={isCalculating}>
+        {isCalculating ? "Calculando..." : "Calcular Ruta"}
+      </button>
 
       {pathResult && (
         <div className="path-result">

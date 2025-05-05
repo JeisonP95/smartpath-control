@@ -1,0 +1,186 @@
+/* Graph container */
+.graph-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .graph-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .graph-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .view-toggle-button {
+    padding: 6px 12px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .view-toggle-button:hover {
+    background-color: #3a7bc8;
+  }
+  
+  /* Graph view container with sidebar */
+  .graph-view-container {
+    display: flex;
+    flex: 1;
+    height: 500px;
+  }
+  
+  .graph-view {
+    flex: 1;
+    height: 100%;
+  }
+  
+  .map-view {
+    flex: 1;
+    height: 500px;
+  }
+  
+  /* Legend */
+  .graph-legend {
+    display: flex;
+    padding: 10px 16px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+  }
+  
+  .legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    margin-right: 8px;
+  }
+  
+  /* Node styling */
+  .node {
+    padding: 10px;
+    border-radius: 5px;
+    width: 180px;
+    font-size: 12px;
+    color: #222;
+    text-align: center;
+    border: 1px solid #1a192b;
+    transition: box-shadow 0.3s, background-color 0.3s;
+  }
+  
+  .node-header {
+    font-weight: bold;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .node-content {
+    min-height: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .empty-message {
+    color: #999;
+    font-style: italic;
+    font-size: 11px;
+  }
+  
+  .item-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+  }
+  
+  .node-item {
+    padding: 4px 8px;
+    margin: 4px 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+    font-size: 11px;
+  }
+  
+  /* Node type specific styling */
+  .bodega-node {
+    background-color: #d4f0fd;
+  }
+  
+  .zona-carga-node {
+    background-color: #e6f5d0;
+  }
+  
+  .distribucion-node {
+    background-color: #f9e0e3;
+  }
+  
+  /* Drag and drop styling */
+  .node.drag-over {
+    box-shadow: 0 0 0 2px #4caf50;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  
+  /* Sidebar styling */
+  .items-sidebar {
+    width: 200px;
+    background-color: #f8f8f8;
+    padding: 15px;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+  }
+  
+  .items-sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .items-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .draggable-item {
+    padding: 8px 12px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: grab;
+    user-select: none;
+    transition: all 0.2s;
+  }
+  
+  .draggable-item:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .draggable-item.dragging {
+    opacity: 0.5;
+  }
+  

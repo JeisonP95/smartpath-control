@@ -1,5 +1,3 @@
-"use client"
-
 import { useCallback, useState, useEffect } from "react"
 import ReactFlow, {
   Background,
@@ -11,11 +9,14 @@ import ReactFlow, {
   type NodePositionChange,
 } from "reactflow"
 import "reactflow/dist/style.css"
-import type { Props } from "./interface"
-import { nodeTypes } from "./graph.data"
-import { calculateDistance } from "../../services/distancia"
+import type { Props } from "./utils/interface"
+import { nodeTypes } from "./components/graph.data"
+import { calculateDistance } from "../../utils/distancia"
+import { useGraph } from "../../context/GraphContext"
 
-const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas", onDistancesChange }: Props) => {
+const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas" }: Props) => {
+  const { updateNodePosition } = useGraph();
+  
   // Convertir nodos a formato ReactFlow
   const initialNodes: ReactFlowNode[] = nodes.map((node) => ({
     id: node.id,
@@ -23,269 +24,111 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
     position: { x: node.x, y: node.y },
     type: node.type,
     // permitir arrastrar nodos
-    draggable: node.type === "distribucion" || node.type === "bodega" || node.type === "zonaCarga",
-  }))
+    draggable: node.type === "distribucion" || node.type === "bodega"|| node.type === "zonaCarga",
+   
+    
+    }))
 
   // Estado para nodos y aristas
   const [reactFlowNodes, setReactFlowNodes] = useState<ReactFlowNode[]>(initialNodes)
   const [reactFlowEdges, setReactFlowEdges] = useState<ReactFlowEdge[]>([])
-  // Estado para almacenar las distancias actualizadas
-  const [updatedDistances, setUpdatedDistances] = useState<Map<string, number>>(new Map())
 
-  // Determinar si una arista está en la ruta resaltada (SOLO en la dirección solicitada)
+  // Determinar si una arista está en la ruta resaltada
   const isEdgeInPath = useCallback(
     (from: string, to: string): boolean => {
       if (!highlightedPath || highlightedPath.length < 2) return false
 
-      // Verificar SOLO la dirección normal (no la inversa)
       for (let i = 0; i < highlightedPath.length - 1; i++) {
         if (highlightedPath[i] === from && highlightedPath[i + 1] === to) {
           return true
         }
       }
-
       return false
     },
     [highlightedPath],
   )
 
-  // Modificar la función createConnectionMap para identificar conexiones bidireccionales
-  const createConnectionMap = useCallback((edgesList: any[]) => {
-    const connectionMap = new Map()
-    const bidirectionalMap = new Map()
+  // Función para calcular las aristas actualizadas
+  const calculateUpdatedEdges = useCallback(
+    (currentNodes: ReactFlowNode[]) => {
+      const nodeMap = new Map(currentNodes.map((node) => [node.id, node]))
 
-    // Primero identificamos todas las conexiones
-    edgesList.forEach((edge) => {
-      const key = `${edge.from}-${edge.to}`
-      connectionMap.set(key, {
-        count: (connectionMap.get(key)?.count || 0) + 1,
-        edge,
-      })
-    })
+      return edges.map((edge, index) => {
+        const isInPath = isEdgeInPath(edge.from, edge.to)
+        const sourceNode = nodeMap.get(edge.from)
+        const targetNode = nodeMap.get(edge.to)
 
-    // Luego identificamos las conexiones bidireccionales
-    edgesList.forEach((edge) => {
-      const key = `${edge.from}-${edge.to}`
-      const reverseKey = `${edge.to}-${edge.from}`
+        let distance = edge.distance
+        let estimatedTime = edge.estimatedTime
 
-      if (connectionMap.has(reverseKey)) {
-        // Esta es una conexión bidireccional
-        bidirectionalMap.set(key, true)
-        bidirectionalMap.set(reverseKey, true)
-      }
-    })
+        if (sourceNode && targetNode) {
+          const sourceType = nodes.find((n) => n.id === edge.from)?.type
+          const targetType = nodes.find((n) => n.id === edge.to)?.type
 
-    return { connectionMap, bidirectionalMap }
-  }, [])
+          if (
+            ["bodega", "zonaCarga", "distribucion"].includes(sourceType || "") ||
+            ["bodega", "zonaCarga", "distribucion"].includes(targetType || "")
+          ) {
+            distance = calculateDistance(
+              sourceNode.position.x,
+              sourceNode.position.y,
+              targetNode.position.x,
+              targetNode.position.y,
+            )
 
-  // Modificar la función createEdge para manejar conexiones bidireccionales
-  const createEdge = useCallback(
-    (
-      edge: any,
-      index: number,
-      isInPath: boolean,
-      distance: number,
-      estimatedTime: number | undefined,
-      connectionInfo: { connectionMap: Map<string, any>; bidirectionalMap: Map<string, boolean> },
-    ): ReactFlowEdge => {
-      const { connectionMap, bidirectionalMap } = connectionInfo
-      const key = `${edge.from}-${edge.to}`
-      const reverseKey = `${edge.to}-${edge.from}`
-
-      // Verificar si es una conexión bidireccional
-      const isBidirectional = bidirectionalMap.has(key)
-
-      // Obtener tipos de nodos para verificar si es una conexión entre distribución y zona de carga
-      const sourceType = nodes.find((n) => n.id === edge.from)?.type
-      const targetType = nodes.find((n) => n.id === edge.to)?.type
-
-      const isDistributionZonaConnection =
-        (sourceType === "distribucion" && targetType === "zonaCarga") ||
-        (sourceType === "zonaCarga" && targetType === "distribucion")
-
-      // Calcular desplazamiento vertical para evitar superposición
-      let yOffset = 0
-
-      // Para conexiones bidireccionales, desplazar hacia arriba o hacia abajo según la dirección
-      if (isBidirectional) {
-        // Si es bidireccional, desplazar hacia arriba o hacia abajo según la dirección
-        yOffset = edge.from < edge.to ? -15 : 15
-      } else if (connectionMap.get(key)?.count > 1) {
-        // Si hay múltiples conexiones en la misma dirección
-        yOffset = -25
-      } else if (connectionMap.has(reverseKey)) {
-        // Si hay una conexión en la dirección opuesta pero no es bidireccional
-        yOffset = 25
-      }
-
-      // Añadir desplazamiento adicional para conexiones entre distribución y zona de carga
-      if (isDistributionZonaConnection) {
-        yOffset += edge.from < edge.to ? -5 : 5
-      }
-
-      // Formatear la etiqueta
-      let labelText = `${distance.toFixed(1)} km`
-      if (estimatedTime) {
-        labelText += ` / ${Math.floor(estimatedTime)} min`
-      }
-
-      // Añadir indicador de dirección
-      labelText += edge.from < edge.to ? " ↓" : " ↑"
-
-      return {
-        id: `e${index}`,
-        source: edge.from,
-        target: edge.to,
-        animated: isInPath,
-        label: labelText,
-        style: {
-          stroke: isInPath ? "#ffcc00" : "#00cc44",
-          strokeWidth: isInPath ? 3 : 1.5,
-        },
-        labelStyle: {
-          fontSize: "11px",
-          fontWeight: "bold",
-          fill: "#333",
-          transform: `translateY(${yOffset}px)`,
-        },
-        labelBgStyle: {
-          fill: "rgba(255, 255, 255, 0.95)",
-          stroke: "#ddd",
-          strokeWidth: 1,
-        },
-        labelBgPadding: [8, 4] as [number, number],
-        labelBgBorderRadius: 4,
-        labelShowBg: true,
-        className: `edge-label-${index} ${isInPath ? "edge-in-path" : ""} ${
-          isDistributionZonaConnection ? "distribution-zone-connection" : ""
-        } ${isBidirectional ? "bidirectional-connection" : ""}`,
-      }
-    },
-    [nodes],
-  )
-
-  // Actualizar el useEffect para usar la nueva estructura de connectionMap
-  useEffect(() => {
-    // Crear un mapa de nodos para acceso rápido
-    const nodeMap = new Map(reactFlowNodes.map((node) => [node.id, node]))
-
-    // Crear mapa de conexiones con la nueva estructura
-    const connectionInfo = createConnectionMap(edges)
-
-    // Crear un mapa para almacenar las distancias actualizadas
-    const newDistances = new Map<string, number>()
-
-    // Crear aristas para reactflow con distancias recalculadas
-    const updatedEdges = edges.map((edge, index) => {
-      const isInPath = isEdgeInPath(edge.from, edge.to)
-
-      // Obtener posiciones actuales de los nodos
-      const sourceNode = nodeMap.get(edge.from)
-      const targetNode = nodeMap.get(edge.to)
-
-      let distance = edge.distance
-      let estimatedTime = edge.estimatedTime
-
-      // Recalcular distancia si ambos nodos existen
-      if (sourceNode && targetNode) {
-        // Calcular nueva distancia basada en las posiciones actuales
-        distance = calculateDistance(
-          sourceNode.position.x,
-          sourceNode.position.y,
-          targetNode.position.x,
-          targetNode.position.y,
-        )
-
-        // Actualizar tiempo estimado basado en la nueva distancia
-        if (edge.estimatedTime) {
-          const speedFactor = edge.estimatedTime / edge.distance
-          estimatedTime = distance * speedFactor
+            if (edge.estimatedTime) {
+              const speedFactor = edge.estimatedTime / edge.distance
+              estimatedTime = distance * speedFactor
+            }
+          }
         }
 
-        // Guardar la distancia actualizada
-        const key = `${edge.from}-${edge.to}`
-        newDistances.set(key, distance)
-      }
+        return {
+          id: `e${index}`,
+          source: edge.from,
+          target: edge.to,
+          animated: isInPath,
+          label: `${distance.toFixed(1)} km${estimatedTime ? ` / ${Math.floor(estimatedTime)} min` : ""}`,
+          style: {
+            stroke: isInPath ? "#ffcc00" : "#00cc44",
+            strokeWidth: isInPath ? 3 : 1.5,
+          },
+        }
+      })
+    },
+    [edges, isEdgeInPath, nodes],
+  )
 
-      return createEdge(edge, index, isInPath, distance, estimatedTime, connectionInfo)
-    })
-
+  // Actualizar aristas cuando cambian los nodos o las aristas originales
+  useEffect(() => {
+    const updatedEdges = calculateUpdatedEdges(reactFlowNodes)
     setReactFlowEdges(updatedEdges)
-    setUpdatedDistances(newDistances)
+  }, [reactFlowNodes, calculateUpdatedEdges])
 
-    // Notificar al componente padre sobre los cambios en las distancias
-    if (onDistancesChange && newDistances.size > 0) {
-      onDistancesChange(newDistances)
-    }
-  }, [reactFlowNodes, edges, isEdgeInPath, nodes, createEdge, createConnectionMap, onDistancesChange])
-
-  // Actualizar también el onNodesChange para usar la nueva estructura
+  // Manejar cambios en los nodos (drag and drop)
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
       setReactFlowNodes((nds) => {
         const newNodes = applyNodeChanges(changes, nds)
-
-        // Si el cambio es de posición, actualizar las aristas
-        const positionChanges = changes.filter((change): change is NodePositionChange => change.type === "position")
+        const positionChanges = changes.filter(
+          (change): change is NodePositionChange => change.type === "position" && change.dragging === false,
+        )
 
         if (positionChanges.length > 0) {
-          // Crear un mapa de nodos para acceso rápido
-          const nodeMap = new Map(newNodes.map((node) => [node.id, node]))
-
-          // Crear mapa de conexiones con la nueva estructura
-          const connectionInfo = createConnectionMap(edges)
-
-          // Crear un mapa para almacenar las distancias actualizadas
-          const newDistances = new Map<string, number>()
-
-          // Actualizar aristas con nuevas distancias
-          const updatedEdges = edges.map((edge, index) => {
-            const isInPath = isEdgeInPath(edge.from, edge.to)
-
-            // Obtener posiciones actuales de los nodos
-            const sourceNode = nodeMap.get(edge.from)
-            const targetNode = nodeMap.get(edge.to)
-
-            let distance = edge.distance
-            let estimatedTime = edge.estimatedTime
-
-            // Recalcular distancia si ambos nodos existen
-            if (sourceNode && targetNode) {
-              // Calcular nueva distancia basada en las posiciones actuales
-              distance = calculateDistance(
-                sourceNode.position.x,
-                sourceNode.position.y,
-                targetNode.position.x,
-                targetNode.position.y,
-              )
-
-              // Actualizar tiempo estimado basado en la nueva distancia
-              if (edge.estimatedTime) {
-                const speedFactor = edge.estimatedTime / edge.distance
-                estimatedTime = distance * speedFactor
-              }
-
-              // Guardar la distancia actualizada
-              const key = `${edge.from}-${edge.to}`
-              newDistances.set(key, distance)
+          positionChanges.forEach(change => {
+            const node = newNodes.find(n => n.id === change.id)
+            if (node) {
+              updateNodePosition(change.id, node.position.x, node.position.y)
             }
-
-            return createEdge(edge, index, isInPath, distance, estimatedTime, connectionInfo)
           })
-
+          const updatedEdges = calculateUpdatedEdges(newNodes)
           setReactFlowEdges(updatedEdges)
-          setUpdatedDistances(newDistances)
-
-          // Notificar al componente padre sobre los cambios en las distancias
-          if (onDistancesChange && newDistances.size > 0) {
-            onDistancesChange(newDistances)
-          }
         }
 
         return newNodes
       })
     },
-    [edges, isEdgeInPath, nodes, createEdge, createConnectionMap, onDistancesChange],
+    [calculateUpdatedEdges, updateNodePosition],
   )
 
   return (
@@ -293,7 +136,7 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
       <div className="graph-header">
         <h2>{title}</h2>
         <div className="drag-info">
-          <span>Arrastra las bodegas para recalcular distancias y rutas en tiempo real</span>
+          <span>Arrastra las bodegas para recalcular distancias</span>
         </div>
       </div>
 
