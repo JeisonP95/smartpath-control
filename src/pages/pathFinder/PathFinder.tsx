@@ -71,6 +71,21 @@ const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null
           </select>
         </div>
 
+        <button 
+          className="swap-button" 
+          onClick={() => {
+            const temp = startNode;
+            setStartNode(endNode);
+            setEndNode(temp);
+            // Resetear el resultado de la ruta cuando se intercambian los puntos
+            setPathResult(null);
+            onPathResult(null);
+          }}
+          title="Intercambiar origen y destino"
+        >
+          ↔️
+        </button>
+
         <div className="selector-group">
           <label htmlFor="end-node">Destino:</label>
           <select id="end-node" value={endNode} onChange={(e) => setEndNode(e.target.value)}>
