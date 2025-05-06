@@ -61,10 +61,6 @@ export async function calculateRoute(
     }
   }
 
-  if (result && vehicleId) {
-    result.vehicleId = vehicleId;
-  }
-
   return result;
 }
 

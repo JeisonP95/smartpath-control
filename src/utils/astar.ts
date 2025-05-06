@@ -96,7 +96,6 @@ export function findShortestPathAStar(
         path,
         distance: totalDistance,
         estimatedTime: totalTime,
-        vehicleId, // Ahora es un number, se pasa directamente
         availableEdges: activeEdges
       };
     }

@@ -6,7 +6,6 @@ interface PathResult {
   path: string[]
   distance: number
   estimatedTime: number
-  vehicleId: number
   availableEdges: Edge[]
 }
 
@@ -53,16 +52,6 @@ export interface ConditionMap {
   horasPico: boolean
 }
 
-// Interfaz para los vehículos
-export interface Vehicle {
-  id: number
-  name: string
-  type: string
-  capacity: number
-  speedFactor: number
-  available: boolean
-}
-
 // Interfaz para los algoritmos de ruta
 export interface RouteAlgorithm {
   name: string
@@ -99,5 +88,4 @@ export const CustomNode: FunctionComponent<NodeProps> = (props) => {
     borderColor = "#c0392b"
     icon = "📦"
   }
-
 }

@@ -7,7 +7,6 @@ import {
   getNodes, 
   getEdges, 
   getConditions, 
-  getVehicles, 
   getRouteAlgorithms,
   evalCondition 
 } from "./pages/graph/components/graph.algorimths"
@@ -18,7 +17,6 @@ import type {
   ConditionMap,
   PathResult,
   Condition,
-  Vehicle,
   RouteAlgorithm,
   ConditionKey,
 } from "./pages/graph/utils/interface"
@@ -29,13 +27,11 @@ function AppContent() {
     nodes, 
     edges, 
     conditions, 
-    vehicles, 
     algorithms, 
     activeConditions,
     setNodes, 
     setEdges, 
     setConditions, 
-    setVehicles, 
     setAlgorithms, 
     setActiveConditions 
   } = useGraph()
@@ -50,13 +46,11 @@ function AppContent() {
         const nodesData = await getNodes()
         const edgesData = await getEdges()
         const conditionsData = await getConditions()
-        const vehiclesData = await getVehicles()
         const algorithmsData = await getRouteAlgorithms()
 
         setNodes(nodesData)
         setEdges(edgesData)
         setConditions(conditionsData)
-        setVehicles(vehiclesData)
         setAlgorithms(algorithmsData)
   
         const condMap: ConditionMap = {} as ConditionMap

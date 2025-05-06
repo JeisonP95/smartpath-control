@@ -1,6 +1,6 @@
 import { type NodeTypes, Handle, Position, type NodeProps } from "reactflow"
 import "reactflow/dist/style.css"
-import { Edge, NodeData, Vehicle, RouteAlgorithm, Condition} from "../utils/interface"
+import { Edge, NodeData, RouteAlgorithm, Condition} from "../utils/interface"
 
 
 // Datos de ejemplo para desarrollo local
@@ -58,13 +58,6 @@ export const mockConditions: Condition[] = [
   { key: "permisoCarga", label: "Permiso de Carga", description: "Autorización para transportar mercancía", icon: "📝", active: true },
   { key: "mantenimiento", label: "Mantenimiento", description: "Vías en reparación", icon: "🔧", active: false },
   { key: "horasPico", label: "Horas Pico", description: "Horarios de alta congestión", icon: "⏰", active: false },
-];
-
-export const mockVehicles: Vehicle[] = [
-  { id: 1, name: "Camión 1", type: "camion", capacity: 5000, speedFactor: 0.8, available: true },
-  { id: 2, name: "Camión 2", type: "camion", capacity: 8000, speedFactor: 0.7, available: true },
-  { id: 3, name: "Furgoneta 1", type: "furgoneta", capacity: 1500, speedFactor: 1.2, available: true },
-  { id: 4, name: "Motocicleta 1", type: "moto", capacity: 100, speedFactor: 1.5, available: true },
 ];
 
 // Algoritmos de ruta disponibles
