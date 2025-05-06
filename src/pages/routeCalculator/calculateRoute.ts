@@ -9,7 +9,14 @@ const isDevelopment = import.meta.env.DEV;
 
 // Calcular ruta
 export async function calculateRoute(
-startNode: string, endNode: string, optimizeFor: string, undefined: undefined, nodes: NodeData[], edges: Edge[], optimizeFor: "distance" | "time", nodes: NodeData[], edges: Edge[]): Promise<PathResult | null> {
+  startNode: string,
+  endNode: string,
+  optimizeFor: "distance" | "time",
+  vehicleId: number | undefined,
+  nodes: NodeData[],
+  edges: Edge[]
+): Promise<PathResult | null> {
+
   // Actualizar las aristas con las nuevas posiciones de los nodos
   const updatedEdges = updateEdgesWithNewDistances(edges, nodes);
   
@@ -33,8 +40,7 @@ startNode: string, endNode: string, optimizeFor: string, undefined: undefined, n
     updatedEdges,
     nodesMap,
     conditions,
-    optimizeFor,
-
+    optimizeFor
   );
   
   if (result && !isDevelopment) {
@@ -46,6 +52,7 @@ startNode: string, endNode: string, optimizeFor: string, undefined: undefined, n
         path: JSON.stringify(result.path),
         distance: result.distance,
         estimated_time: result.estimatedTime,
+        vehicle_id: vehicleId,
         conditions_snapshot: JSON.stringify(conditions),
         algorithm: "astar",
       });
@@ -56,4 +63,3 @@ startNode: string, endNode: string, optimizeFor: string, undefined: undefined, n
 
   return result;
 }
-
