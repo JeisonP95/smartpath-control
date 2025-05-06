@@ -23,8 +23,7 @@ const mockEdges: Edge[] = [
 // zonas de carga a distribucion central
   { from: "5", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "4", to: "6", condition: "true", distance: 5, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "6", to: "5", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "6", to: "4", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  
   // Distribuccion central a bodegas(a,b,c)
   {from: "6", to: "1",condition: "true",distance: 8,estimatedTime: 25,trafficFactor: 1.2},
   {from: "6", to: "2",condition: "true",distance: 8,estimatedTime: 25,trafficFactor: 1.2},
@@ -41,7 +40,8 @@ const mockEdges: Edge[] = [
   { from: "2", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "3", to: "6", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   // distribucion central a zona de cargas
-
+  { from: "6", to: "5", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "6", to: "4", condition: "true", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
  
   /*{ from: "4", to: "2", condition: "!mantenimiento || !horasPico", distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "6", to: "2", condition: "!mantenimiento", distance: 4, estimatedTime: 12, trafficFactor: 1.0 },
