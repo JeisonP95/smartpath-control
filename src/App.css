@@ -6,7 +6,7 @@
 }
 
 body {
- 
+
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #4e73aa;
   color: #333;
@@ -110,12 +110,14 @@ body {
   border-bottom: 1px solid #e0e0e0;
 }
 
-.control-panel h2, .path-finder h2 {
+.control-panel h2,
+.path-finder h2 {
   margin-bottom: 0.5rem;
   color: #2c3e50;
 }
 
-.control-description, .path-description {
+.control-description,
+.path-description {
   margin-bottom: 1rem;
   color: #7f8c8d;
   font-size: 0.9rem;
@@ -302,9 +304,7 @@ body {
 
 .result-distance,
 .result-time,
-.result-vehicle {
-  margin-bottom: 10px;
-}
+
 
 .path-nodes {
   display: flex;
@@ -388,6 +388,7 @@ body {
 .tab-button:hover {
   background-color: #f8f9fa;
 }
+
 .control-description,
 .path-description,
 .history-description {
@@ -465,12 +466,7 @@ body {
 }
 
 .history-algorithm,
-.history-vehicle {
-  background-color: #ecf0f1;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-}
+
 
 .no-history {
   text-align: center;
@@ -572,26 +568,27 @@ body {
     flex-direction: column;
     height: auto;
   }
-  
+
   .app-sidebar {
     width: 100%;
     max-height: none;
     border-right: none;
     border-bottom: 1px solid #e0e0e0;
   }
-  
+
   .app-main {
     height: 60vh;
   }
-  
-  .control-panel, .path-finder {
+
+  .control-panel,
+  .path-finder {
     padding: 1rem;
   }
-  
+
   .graph-container {
     height: 100%;
   }
-  
+
   .node {
     width: 100px;
     padding: 8px 12px;
@@ -604,70 +601,70 @@ body {
   .app-header {
     padding: 0.8rem 1rem;
   }
-  
+
   .app-header h1 {
     font-size: 1.3rem;
   }
-  
+
   .app-description {
     font-size: 0.8rem;
   }
-  
+
   .path-selectors {
     flex-direction: row;
     align-items: center;
     flex-wrap: wrap;
   }
-  
+
   .condition-card {
     flex-direction: column;
     align-items: flex-start;
     padding: 12px;
   }
-  
+
   .condition-icon {
     margin-bottom: 8px;
     margin-right: 0;
   }
-  
+
   .condition-status {
     margin-top: 8px;
     align-self: flex-start;
   }
-  
+
   .graph-legend {
     bottom: 10px;
     right: 10px;
     padding: 8px;
     font-size: 0.7rem;
   }
-  
+
   .legend-color {
     width: 12px;
     height: 12px;
   }
-  
+
   .app-main {
     height: 50vh;
   }
-  
+
   .node {
     width: 80px;
     padding: 6px 10px;
     font-size: 9px;
   }
-  
+
   .path-selectors {
     flex-direction: row;
     align-items: center;
     flex-wrap: wrap;
   }
-  
+
   .selector-group {
     flex: 1;
     min-width: 120px;
   }
-  
+
   .swap-button {
     width: 32px;
     height: 32px;
@@ -681,51 +678,53 @@ body {
   .app-header h1 {
     font-size: 1.1rem;
   }
-  
+
   .app-description {
     font-size: 0.7rem;
   }
-  
-  .control-panel h2, .path-finder h2 {
+
+  .control-panel h2,
+  .path-finder h2 {
     font-size: 1.1rem;
   }
-  
-  .control-description, .path-description {
+
+  .control-description,
+  .path-description {
     font-size: 0.8rem;
   }
-  
+
   .condition-name {
     font-size: 0.8rem;
   }
-  
+
   .condition-description {
     font-size: 0.7rem;
   }
-  
+
   .graph-legend {
     bottom: 5px;
     right: 5px;
     padding: 5px;
     font-size: 0.6rem;
   }
-  
+
   .app-main {
     height: 40vh;
   }
-  
+
   /* Reducir aun más el tamaño de los nodos */
   .node {
     width: 70px;
     padding: 5px 8px;
     font-size: 8px;
   }
-  
+
   /* Ajustar tamaño de texto en resultado del camino */
   .path-node {
     font-size: 0.7rem;
     padding: 3px 6px;
   }
-  
+
   .swap-button {
     width: 28px;
     height: 28px;
@@ -738,21 +737,21 @@ body {
   .app-content {
     flex-direction: row;
   }
-  
+
   .app-sidebar {
     width: 300px;
     height: calc(100vh - 60px);
     overflow-y: auto;
   }
-  
+
   .app-main {
     height: calc(100vh - 60px);
   }
-  
+
   .app-header {
     padding: 0.5rem 1rem;
   }
-  
+
   .app-header h1 {
     font-size: 1.1rem;
   }
@@ -763,22 +762,22 @@ body {
   .app-sidebar {
     width: 400px;
   }
-  
+
   .condition-card {
     padding: 15px;
   }
-  
+
   .node {
     width: 140px;
     padding: 12px 18px;
     font-size: 14px;
   }
-  
+
   .graph-legend {
     padding: 15px;
     font-size: 1rem;
   }
-  
+
   .legend-color {
     width: 18px;
     height: 18px;

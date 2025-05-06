@@ -40,7 +40,7 @@ export async function calculateRoute(
     nodesMap,
     conditions,
     optimizeFor,
-    vehicleId ?? 0
+    
   );
   
   if (result && !isDevelopment) {

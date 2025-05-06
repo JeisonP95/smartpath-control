@@ -48,25 +48,14 @@
   background-color: #e0e0e0;
 }
 
-.vehicle-selector,
 .algorithm-selector {
   margin-bottom: 20px;
 }
 
-.vehicle-selector label,
 .algorithm-selector label {
   display: block;
   margin-bottom: 5px;
   color: #333;
-}
-
-.vehicle-selector select,
-.algorithm-selector select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: white;
 }
 
 .optimize-options {

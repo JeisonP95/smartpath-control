@@ -12,8 +12,7 @@ const mockRouteHistory: any[] = [
       estimated_time: 38,
       algorithm: "astar",
       created_at: new Date().toISOString(),
-      vehicles: { name: "Camión 1" },
-    },
+   },
     {
       id: 2,
       start_node: "2",
@@ -23,8 +22,7 @@ const mockRouteHistory: any[] = [
       estimated_time: 73,
       algorithm: "astar",
       created_at: new Date(Date.now() - 86400000).toISOString(), // Ayer
-      vehicles: { name: "Furgoneta 1" },
-    },
+},
   ];
 const isDevelopment = import.meta.env.DEV;
 export async function saveRoute(route: PathResult): Promise<boolean> {
@@ -41,7 +39,6 @@ export async function saveRoute(route: PathResult): Promise<boolean> {
       path: JSON.stringify(route.path),
       distance: route.distance,
       estimated_time: route.estimatedTime,
-      vehicle_id: route.vehicleId,
       algorithm: "custom",
     });
 
@@ -75,8 +72,7 @@ export async function getRouteHistory(limit = 10): Promise<any[]> {
         estimated_time, 
         algorithm, 
         created_at,
-        vehicles(name)
-      `)
+        `)
       .order("created_at", { ascending: false })
       .limit(limit);
 

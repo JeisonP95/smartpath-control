@@ -25,7 +25,7 @@ export function findShortestPathAStar(
   nodesMap: Record<string, { x: number; y: number }>,
   conditions: ConditionMap,
   optimizeFor: "distance" | "time" = "distance",
-  vehicleId: number // Ahora es obligatorio y debe ser un número
+  
 ): PathResult | null {
   const activeEdges: Edge[] = [];
 
