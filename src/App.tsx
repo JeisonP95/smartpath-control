@@ -7,7 +7,10 @@ import {
   getNodes, 
   getEdges, 
   getConditions, 
+<<<<<<< HEAD
   getVehicles, 
+=======
+>>>>>>> 6e4952964f5dc2b5258f39d3a5ac438a483f2925
   getRouteAlgorithms,
   evalCondition 
 } from "./pages/graph/components/graph.algorimths"
@@ -18,7 +21,10 @@ import type {
   ConditionMap,
   PathResult,
   Condition,
+<<<<<<< HEAD
   Vehicle,
+=======
+>>>>>>> 6e4952964f5dc2b5258f39d3a5ac438a483f2925
   RouteAlgorithm,
   ConditionKey,
 } from "./pages/graph/utils/interface"
@@ -29,13 +35,19 @@ function AppContent() {
     nodes, 
     edges, 
     conditions, 
+<<<<<<< HEAD
     vehicles, 
+=======
+>>>>>>> 6e4952964f5dc2b5258f39d3a5ac438a483f2925
     algorithms, 
     activeConditions,
     setNodes, 
     setEdges, 
     setConditions, 
+<<<<<<< HEAD
     setVehicles, 
+=======
+>>>>>>> 6e4952964f5dc2b5258f39d3a5ac438a483f2925
     setAlgorithms, 
     setActiveConditions 
   } = useGraph()
@@ -50,13 +62,19 @@ function AppContent() {
         const nodesData = await getNodes()
         const edgesData = await getEdges()
         const conditionsData = await getConditions()
+<<<<<<< HEAD
         const vehiclesData = await getVehicles()
+=======
+>>>>>>> 6e4952964f5dc2b5258f39d3a5ac438a483f2925
         const algorithmsData = await getRouteAlgorithms()
 
         setNodes(nodesData)
         setEdges(edgesData)
         setConditions(conditionsData)
+<<<<<<< HEAD
         setVehicles(vehiclesData)
+=======
+>>>>>>> 6e4952964f5dc2b5258f39d3a5ac438a483f2925
         setAlgorithms(algorithmsData)
   
         const condMap: ConditionMap = {} as ConditionMap

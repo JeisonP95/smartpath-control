@@ -4,10 +4,9 @@ import { PathResult } from "../graph/utils/interface"
 import { useGraph } from "../../context/GraphContext"
 
 const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null) => void }) => {
-  const { nodes, vehicles, algorithms, edges } = useGraph();
+  const { nodes, algorithms, edges } = useGraph();
   const [startNode, setStartNode] = useState<string>("1")
   const [endNode, setEndNode] = useState<string>("3")
-  const [selectedVehicle, setSelectedVehicle] = useState<number | undefined>(undefined)
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<string>("A*")
   const [optimizeFor, setOptimizeFor] = useState<"distance" | "time">("distance")
   const [pathResult, setPathResult] = useState<PathResult | null>(null)
@@ -20,7 +19,7 @@ const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null
         startNode, 
         endNode, 
         optimizeFor, 
-        selectedVehicle,
+        undefined,
         nodes,
         edges
       )
@@ -47,13 +46,6 @@ const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null
     return node ? node.label : id
   }
 
-  // Función para obtener el nombre del vehículo a partir de su ID
-  const getVehicleNameById = (id: number | undefined): string => {
-    if (!id) return "Sin vehículo"
-    const vehicle = vehicles.find((v) => v.id === id)
-    return vehicle ? vehicle.name : `Vehículo ${id}`
-  }
-
   return (
     <div className="path-finder">
       <h2>Calculador de Rutas</h2>
@@ -77,7 +69,6 @@ const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null
             const temp = startNode;
             setStartNode(endNode);
             setEndNode(temp);
-            // Resetear el resultado de la ruta cuando se intercambian los puntos
             setPathResult(null);
             onPathResult(null);
           }}
@@ -111,22 +102,6 @@ const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null
           <small className="algorithm-description">
             {algorithms.find((a) => a.name === selectedAlgorithm)?.description}
           </small>
-        </div>
-
-        <div className="selector-group">
-          <label htmlFor="vehicle">Vehículo:</label>
-          <select
-            id="vehicle"
-            value={selectedVehicle || ""}
-            onChange={(e) => setSelectedVehicle(e.target.value ? Number.parseInt(e.target.value) : undefined)}
-          >
-            <option value="">Sin vehículo</option>
-            {vehicles.map((vehicle) => (
-              <option key={vehicle.id} value={vehicle.id}>
-                {vehicle.name} ({vehicle.type})
-              </option>
-            ))}
-          </select>
         </div>
 
         <div className="optimize-options">
@@ -169,11 +144,6 @@ const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null
           {pathResult.estimatedTime && (
             <div className="result-time">
               <strong>Tiempo Estimado:</strong> {Math.floor(pathResult.estimatedTime)} min
-            </div>
-          )}
-          {pathResult.vehicleId && (
-            <div className="result-vehicle">
-              <strong>Vehículo:</strong> {getVehicleNameById(pathResult.vehicleId)}
             </div>
           )}
           <div className="result-path">

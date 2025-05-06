@@ -41,6 +41,8 @@ export async function calculateRoute(
     conditions,
     optimizeFor,
     vehicleId ?? 0
+
+
   );
   
   if (result && !isDevelopment) {
@@ -59,10 +61,6 @@ export async function calculateRoute(
     } catch (error) {
       console.error("Error saving route to history:", error);
     }
-  }
-
-  if (result && vehicleId) {
-    result.vehicleId = vehicleId;
   }
 
   return result;

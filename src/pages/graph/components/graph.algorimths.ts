@@ -1,7 +1,7 @@
 import { createServerSupabaseClient } from "../../../services/supabase"
 import { calculateDistance } from "../../../utils/distancia"
-import { Edge, NodeData, Vehicle, RouteAlgorithm, Condition, ConditionMap, ConditionKey} from "../utils/interface"
-import { mockNodes, mockEdges, mockConditions, mockVehicles, mockAlgorithms } from "./graph.data"
+import { Edge, NodeData, RouteAlgorithm, Condition, ConditionMap, ConditionKey} from "../utils/interface"
+import { mockNodes, mockEdges, mockConditions, mockAlgorithms } from "./graph.data"
 
 // Verificar si estamos en modo de desarrollo
 const isDevelopment = import.meta.env.DEV;
@@ -166,35 +166,6 @@ export async function updateCondition(key: string, active: boolean): Promise<boo
   } catch (error) {
     console.error("Error in updateCondition:", error);
     return false;
-  }
-}
-
-// Obtener todos los vehículos
-export async function getVehicles(): Promise<Vehicle[]> {
-  if (isDevelopment) {
-    return mockVehicles;
-  }
-
-  try {
-    const supabase = createServerSupabaseClient();
-    const { data, error } = await supabase.from("vehicles").select("*");
-
-    if (error) {
-      console.error("Error fetching vehicles:", error);
-      return [];
-    }
-
-    return data.map((vehicle) => ({
-      id: vehicle.id,
-      name: vehicle.name,
-      type: vehicle.type,
-      capacity: vehicle.capacity,
-      speedFactor: vehicle.speed_factor,
-      available: vehicle.available,
-    }));
-  } catch (error) {
-    console.error("Error in getVehicles:", error);
-    return [];
   }
 }
 
