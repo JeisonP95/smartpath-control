@@ -24,14 +24,7 @@
   color: #2c3e50;
 }
 
-.drag-info {
-  font-size: 0.8rem;
-  color: #7f8c8d;
-  background-color: #f8f9fa;
-  padding: 5px 10px;
-  border-radius: 4px;
-  border-left: 3px solid #3498db;
-}
+
 
 .view-toggle-button {
   background-color: #3498db;

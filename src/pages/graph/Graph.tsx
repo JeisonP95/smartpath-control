@@ -16,7 +16,7 @@ import { useGraph } from "../../context/GraphContext"
 
 const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas" }: Props) => {
   const { updateNodePosition } = useGraph();
-  
+
   // Convertir nodos a formato ReactFlow
   const initialNodes: ReactFlowNode[] = nodes.map((node) => ({
     id: node.id,
@@ -24,10 +24,10 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
     position: { x: node.x, y: node.y },
     type: node.type,
     // permitir arrastrar nodos
-    draggable: node.type === "distribucion" || node.type === "bodega"|| node.type === "zonaCarga",
-   
-    
-    }))
+    draggable: node.type === "distribucion" || node.type === "bodega" || node.type === "zonaCarga",
+
+
+  }))
 
   // Estado para nodos y aristas
   const [reactFlowNodes, setReactFlowNodes] = useState<ReactFlowNode[]>(initialNodes)
@@ -136,7 +136,6 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
       <div className="graph-header">
         <h2>{title}</h2>
         <div className="drag-info">
-          <span>Arrastra las bodegas para recalcular distancias</span>
         </div>
       </div>
 
