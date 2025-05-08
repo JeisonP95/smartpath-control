@@ -14,36 +14,79 @@ export const mockNodes: NodeData[] = [
 
 // Limpiar el arreglo mockEdges eliminando duplicados bidireccionales
 export const mockEdges: Edge[] = [
-  // Zonas de carga a distribución central (bidireccionales)
+  // *********************************Zonas de carga a distribución central (bidireccionales)*********************************
   { from: "4", to: "6", condition: "true", bidirectional: true, distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
   { from: "6", to: "4", condition: "true", bidirectional: true, distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
-  // No necesitamos la ruta inversa si bidirectional es true
+  // No se necesitan condicional por que no hay rutas alternas.
 
-  // Zona de carga a zona de carga
+  // *********************************Zona de carga a zona de carga*********************************
   { from: "6", to: "5", condition: "true", bidirectional: true, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "5", to: "6", condition: "true", bidirectional: true, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  // Distribución central a bodegas
+
+  // *********************************Distribución central a bodegas Manteniemieto*********************************
   { from: "6", to: "1", condition: "!mantenimiento", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
   { from: "1", to: "6", condition: "true", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
-  { from: "6", to: "2", condition: "!lluvia && permisoCarga", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "2", to: "6", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "6", to: "3", condition: "!mantenimiento", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "3", to: "6", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "6", to: "1", condition: "!lluvia", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "1", to: "6", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "6", to: "2", condition: "!mantenimiento", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "2", to: "6", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+
+  // *********************************Distribución central a bodegas lluvia*********************************
+  { from: "6", to: "1", condition: "!lluvia", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
+  { from: "1", to: "6", condition: "true", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
+  { from: "6", to: "2", condition: "!lluvia", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "2", to: "6", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "6", to: "3", condition: "!lluvia", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "6", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+
+  // *********************************Distribución central a bodegas horasPico*********************************
+  { from: "6", to: "1", condition: "!horasPico", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
+  { from: "1", to: "6", condition: "true", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
+  { from: "6", to: "3", condition: "!horasPico", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "6", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "6", to: "2", condition: "!horasPico", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+
+  // *********************************Distribución central a bodegas permisoCarga*********************************
+  { from: "6", to: "1", condition: "!permisoCarga", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
+  { from: "1", to: "6", condition: "true", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
+  { from: "6", to: "3", condition: "!permisoCarga", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "6", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "6", to: "2", condition: "!permisoCarga", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  
+ 
 
 
-  // Conexiones entre bodegas (bidireccionales)
+  // *********************************Conexiones entre bodegas (bidireccionales) horasPico*********************************
   { from: "1", to: "2", condition: "!horasPico", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "2", to: "1", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "2", to: "1", condition: "!horasPico", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "1", to: "2", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "2", to: "3", condition: "!horasPico", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "2", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "1", condition: "!horasPico", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "1", to: "3", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+
+   // *********************************Conexiones entre bodegas (bidireccionales) lluvia*********************************
   { from: "1", to: "3", condition: "!lluvia", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "3", to: "1", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "3", to: "2", condition: "!lluvia", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "2", to: "3", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
-  { from: "1", to: "2", condition: "!lluvia", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "2", to: "1", condition: "!lluvia", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "1", to: "2", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+
+   // *********************************Conexiones entre bodegas (bidireccionales) mantenimiento*********************************
+  { from: "2", to: "1", condition: "!mantenimiento", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
+  { from: "1", to: "2", condition: "true", bidirectional: false, distance: 3, estimatedTime: 10, trafficFactor: 1.0 },
+  { from: "1", to: "3", condition: "!mantenimiento", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "1", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "2", to: "3", condition: "!mantenimiento", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "2", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+
+ // *********************************Conexiones entre bodegas (bidireccionales) permisoCarga*********************************
+  { from: "1", to: "2", condition: "!permisoCarga", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
   { from: "2", to: "1", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "2", to: "3", condition: "!permisoCarga", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "2", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "3", to: "1", condition: "!permisoCarga", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
+  { from: "1", to: "3", condition: "true", bidirectional: false, distance: 8, estimatedTime: 25, trafficFactor: 1.2 },
 
 
   /* { from: "1", to: "4", condition: "!lluvia && permisoCarga", distance: 5, estimatedTime: 15, trafficFactor: 1.0 },
