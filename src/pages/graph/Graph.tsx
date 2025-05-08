@@ -1,3 +1,5 @@
+"use client"
+
 import { useCallback, useState, useEffect } from "react"
 import ReactFlow, {
   Background,
@@ -15,7 +17,7 @@ import { calculateDistance } from "../../utils/distancia"
 import { useGraph } from "../../context/GraphContext"
 
 const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas" }: Props) => {
-  const { updateNodePosition } = useGraph();
+  const { updateNodePosition } = useGraph()
 
   // Convertir nodos a formato ReactFlow
   const initialNodes: ReactFlowNode[] = nodes.map((node) => ({
@@ -25,8 +27,6 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
     type: node.type,
     // permitir arrastrar nodos
     draggable: node.type === "distribucion" || node.type === "bodega" || node.type === "zonaCarga",
-
-
   }))
 
   // Estado para nodos y aristas
@@ -115,8 +115,8 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
         )
 
         if (positionChanges.length > 0) {
-          positionChanges.forEach(change => {
-            const node = newNodes.find(n => n.id === change.id)
+          positionChanges.forEach((change) => {
+            const node = newNodes.find((n) => n.id === change.id)
             if (node) {
               updateNodePosition(change.id, node.position.x, node.position.y)
             }
@@ -135,8 +135,7 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
     <div className="graph-container">
       <div className="graph-header">
         <h2>{title}</h2>
-        <div className="drag-info">
-        </div>
+        <div className="drag-info"></div>
       </div>
 
       <div className="graph-view">

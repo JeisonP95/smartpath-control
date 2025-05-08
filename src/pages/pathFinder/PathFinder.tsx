@@ -1,10 +1,12 @@
+"use client"
+
 import { useState } from "react"
 import { calculateRoute } from "../routeCalculator/calculateRoute"
-import { PathResult } from "../graph/utils/interface"
+import type { PathResult } from "../graph/utils/interface"
 import { useGraph } from "../../context/GraphContext"
 
 const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null) => void }) => {
-  const { nodes, algorithms, edges } = useGraph();
+  const { nodes, algorithms, edges } = useGraph()
   const [startNode, setStartNode] = useState<string>("1")
   const [endNode, setEndNode] = useState<string>("3")
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<string>("A*")
@@ -15,14 +17,7 @@ const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null
   const handleCalculate = async () => {
     setIsCalculating(true)
     try {
-      const result = await calculateRoute(
-        startNode, 
-        endNode, 
-        optimizeFor, 
-        undefined,
-        nodes,
-        edges
-      )
+      const result = await calculateRoute(startNode, endNode, optimizeFor, undefined, nodes, edges)
       if (result) {
         setPathResult(result)
         onPathResult(result)
@@ -63,14 +58,14 @@ const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null
           </select>
         </div>
 
-        <button 
-          className="swap-button" 
+        <button
+          className="swap-button"
           onClick={() => {
-            const temp = startNode;
-            setStartNode(endNode);
-            setEndNode(temp);
-            setPathResult(null);
-            onPathResult(null);
+            const temp = startNode
+            setStartNode(endNode)
+            setEndNode(temp)
+            setPathResult(null)
+            onPathResult(null)
           }}
           title="Intercambiar origen y destino"
         >
@@ -122,7 +117,7 @@ const PathFinder = ({ onPathResult }: { onPathResult: (result: PathResult | null
                 type="radio"
                 name="optimize"
                 value="time"
-                checked={optimizeFor === "time"} 
+                checked={optimizeFor === "time"}
                 onChange={() => setOptimizeFor("time")}
               />
               Tiempo

@@ -1,15 +1,10 @@
-import { FunctionComponent } from "react"
-import { NodeProps } from "reactflow"
-
+import type { FunctionComponent } from "react"
+import type { NodeProps } from "reactflow"
 
 interface PathResult {
   path: string[]
   distance: number
   estimatedTime: number
-<<<<<<< HEAD
-  vehicleId: number
-=======
->>>>>>> 6e4952964f5dc2b5258f39d3a5ac438a483f2925
   availableEdges: Edge[]
 }
 
@@ -56,19 +51,6 @@ export interface ConditionMap {
   horasPico: boolean
 }
 
-<<<<<<< HEAD
-// Interfaz para los vehículos
-export interface Vehicle {
-  id: number
-  name: string
-  type: string
-  capacity: number
-  speedFactor: number
-  available: boolean
-}
-
-=======
->>>>>>> 6e4952964f5dc2b5258f39d3a5ac438a483f2925
 // Interfaz para los algoritmos de ruta
 export interface RouteAlgorithm {
   name: string
@@ -105,8 +87,4 @@ export const CustomNode: FunctionComponent<NodeProps> = (props) => {
     borderColor = "#c0392b"
     icon = "📦"
   }
-<<<<<<< HEAD
-
-=======
->>>>>>> 6e4952964f5dc2b5258f39d3a5ac438a483f2925
 }

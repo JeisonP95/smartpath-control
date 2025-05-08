@@ -1,7 +1,6 @@
 import { type NodeTypes, Handle, Position, type NodeProps } from "reactflow"
 import "reactflow/dist/style.css"
 
-
 export const BodegaNode = ({ data }: NodeProps) => (
   <div className="node bodega-node">
     <Handle type="target" position={Position.Top} />
