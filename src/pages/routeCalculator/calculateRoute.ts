@@ -1,11 +1,11 @@
-import { getConditions } from "../graph/components/graph.algorimths";
-import { findShortestPathAStar } from "../../utils/astar";  // Función para calcular ruta usando A*
-import { PathResult, NodeData, Edge } from "../graph/utils/interface";
-import { createServerSupabaseClient } from "../../services/supabase";
-import { ConditionMap } from "../graph/utils/interface";
-import { updateEdgesWithNewDistances } from "../graph/components/graph.algorimths";
+import { getConditions } from "../graph/components/graph.algorimths"
+import { findShortestPathAStar } from "../../utils/astar" // Función para calcular ruta usando A*
+import type { PathResult, NodeData, Edge } from "../graph/utils/interface"
+import { createServerSupabaseClient } from "../../services/supabase"
+import type { ConditionMap } from "../graph/utils/interface"
+import { updateEdgesWithNewDistances } from "../graph/components/graph.algorimths"
 
-const isDevelopment = import.meta.env.DEV;
+const isDevelopment = import.meta.env.DEV
 
 // Calcular ruta
 export async function calculateRoute(
@@ -14,23 +14,23 @@ export async function calculateRoute(
   optimizeFor: "distance" | "time",
   vehicleId: number | undefined,
   nodes: NodeData[],
-  edges: Edge[]
+  edges: Edge[],
 ): Promise<PathResult | null> {
   // Actualizar las aristas con las nuevas posiciones de los nodos
-  const updatedEdges = updateEdgesWithNewDistances(edges, nodes);
-  
+  const updatedEdges = updateEdgesWithNewDistances(edges, nodes)
+
   // Obtener condiciones actuales
-  const conditionsData = await getConditions();
-  const conditions: ConditionMap = {} as any;
+  const conditionsData = await getConditions()
+  const conditions: ConditionMap = {} as any
   conditionsData.forEach((c) => {
-    conditions[c.key] = c.active;
-  });
+    conditions[c.key] = c.active
+  })
 
   // Crear un mapa de nodos para acceso rápido
-  const nodesMap: Record<string, { x: number; y: number }> = {};
+  const nodesMap: Record<string, { x: number; y: number }> = {}
   nodes.forEach((node) => {
-    nodesMap[node.id] = { x: node.x, y: node.y };
-  });
+    nodesMap[node.id] = { x: node.x, y: node.y }
+  })
 
   // Calcular ruta usando A*
   const result: PathResult | null = findShortestPathAStar(
@@ -40,12 +40,11 @@ export async function calculateRoute(
     nodesMap,
     conditions,
     optimizeFor,
-    
-  );
-  
+  )
+
   if (result && !isDevelopment) {
     try {
-      const supabase = createServerSupabaseClient();
+      const supabase = createServerSupabaseClient()
       await supabase.from("routes").insert({
         start_node: startNode,
         end_node: endNode,
@@ -55,12 +54,11 @@ export async function calculateRoute(
         vehicle_id: vehicleId,
         conditions_snapshot: JSON.stringify(conditions),
         algorithm: "astar",
-      });
+      })
     } catch (error) {
-      console.error("Error saving route to history:", error);
+      console.error("Error saving route to history:", error)
     }
   }
 
-  return result;
+  return result
 }
-

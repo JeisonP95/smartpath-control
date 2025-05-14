@@ -1,4 +1,3 @@
-
 export interface Props {
   conditions: Condition[]
   activeConditions: ConditionMap

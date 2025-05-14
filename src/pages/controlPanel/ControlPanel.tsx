@@ -1,7 +1,9 @@
+"use client"
+
 import { useState } from "react"
 import type { ConditionKey } from "../graph/utils/interface"
 import { updateCondition } from "../graph/components/graph.algorimths"
-import { Props } from "./interface"
+import type { Props } from "./interface"
 import { Leaf } from "../../components/icons/icons"
 
 const ControlPanel = ({ conditions, activeConditions, toggle }: Props) => {
@@ -23,7 +25,7 @@ const ControlPanel = ({ conditions, activeConditions, toggle }: Props) => {
     <div className="control-panel">
       <h2>
         Panel de Control
-<Leaf size={20} className="control-panel-icon" />
+        <Leaf size={20} className="control-panel-icon" />
       </h2>
       <p className="control-description">Ajuste las condiciones para ver cómo afectan a las rutas disponibles</p>
 

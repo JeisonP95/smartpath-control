@@ -3,37 +3,32 @@ import Graph from "./pages/graph/Graph"
 import ControlPanel from "./pages/controlPanel/ControlPanel"
 import PathFinder from "./pages/pathFinder/PathFinder"
 import RouteHistory from "./pages/routeHistory/RouteHistory"
-import { 
-  getNodes, 
-  getEdges, 
-  getConditions, 
+import {
+  getNodes,
+  getEdges,
+  getConditions,
   getRouteAlgorithms,
-  evalCondition 
+  evalCondition
 } from "./pages/graph/components/graph.algorimths"
 import { GraphProvider, useGraph } from "./context/GraphContext"
 import type {
-  NodeData,
-  Edge,
   ConditionMap,
   PathResult,
-  Condition,
-  RouteAlgorithm,
   ConditionKey,
 } from "./pages/graph/utils/interface"
 import "./App.css"
 
 function AppContent() {
-  const { 
-    nodes, 
-    edges, 
-    conditions, 
-    algorithms, 
+  const {
+    nodes,
+    edges,
+    conditions,
     activeConditions,
-    setNodes, 
-    setEdges, 
-    setConditions, 
-    setAlgorithms, 
-    setActiveConditions 
+    setNodes,
+    setEdges,
+    setConditions,
+    setAlgorithms,
+    setActiveConditions
   } = useGraph()
 
   const [selectedPath, setSelectedPath] = useState<string[] | null>(null)
@@ -52,7 +47,7 @@ function AppContent() {
         setEdges(edgesData)
         setConditions(conditionsData)
         setAlgorithms(algorithmsData)
-  
+
         const condMap: ConditionMap = {} as ConditionMap
         conditionsData.forEach((cond) => {
           condMap[cond.key] = cond.active
@@ -97,10 +92,10 @@ function AppContent() {
 
       <div className="app-content">
         <aside className="app-sidebar">
-          <ControlPanel 
-            conditions={conditions} 
-            activeConditions={activeConditions} 
-            toggle={handleConditionChange} 
+          <ControlPanel
+            conditions={conditions}
+            activeConditions={activeConditions}
+            toggle={handleConditionChange}
           />
 
           <div className="tab-navigation">
@@ -119,8 +114,8 @@ function AppContent() {
           </div>
 
           {activeTab === "pathfinder" ? (
-            <PathFinder 
-              onPathResult={handlePathResult} 
+            <PathFinder
+              onPathResult={handlePathResult}
             />
           ) : (
             <RouteHistory />
@@ -128,10 +123,10 @@ function AppContent() {
         </aside>
 
         <main className="app-main">
-          <Graph 
-            nodes={nodes} 
-            edges={activeEdges} 
-            highlightedPath={selectedPath} 
+          <Graph
+            nodes={nodes}
+            edges={activeEdges}
+            highlightedPath={selectedPath}
           />
         </main>
       </div>

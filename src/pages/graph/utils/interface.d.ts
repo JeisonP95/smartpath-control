@@ -1,6 +1,5 @@
-import { FunctionComponent } from "react"
-import { NodeProps } from "reactflow"
-
+import type { FunctionComponent } from "react"
+import type { NodeProps } from "reactflow"
 
 interface PathResult {
   path: string[]
