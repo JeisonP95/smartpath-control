@@ -92,7 +92,7 @@ const Graph = ({ nodes, edges, highlightedPath, title = "Visualización de Rutas
           style: {
             stroke: isInPath ? "#ffcc00" : "#00cc44",
             strokeWidth: isInPath ? 3 : 1.5,
-          },
+          }
         }
       })
     },

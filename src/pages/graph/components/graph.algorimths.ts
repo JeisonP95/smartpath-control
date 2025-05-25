@@ -21,9 +21,23 @@ export function evalCondition(expression: string, values: ConditionMap): boolean
     return false
   }
 }
+const currentConditions = mockConditions.reduce((acc, cond) => {
+  acc[cond.key] = cond.active;
+  return acc;
+}, {} as ConditionMap);
+
+const enabledEdges = mockEdges.filter(edge => evalCondition(edge.condition, currentConditions));
+
+console.log(enabledEdges);
+
 
 // Función para recalcular las distancias y tiempos de las aristas
 export function updateEdgesWithNewDistances(edges: Edge[], nodes: NodeData[]): Edge[] {
+  // En modo desarrollo, usar las distancias originales
+  if (isDevelopment) {
+    return edges
+  }
+
   const nodeMap = new Map(nodes.map((node) => [node.id, node]))
 
   return edges.map((edge) => {

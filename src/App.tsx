@@ -84,7 +84,7 @@ function AppContent() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>SmartPath Control - Logística</h1>
+        <h1>SmartPath Control - Logístic</h1>
         <p className="app-description">
           Sistema avanzado de visualización y cálculo de rutas basado en condiciones lógicas
         </p>

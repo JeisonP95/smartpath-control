@@ -1,19 +1,74 @@
 import type { Edge, PathResult, ConditionMap } from "../pages/graph/utils/interface"
-import { evalCondition } from "../pages/graph/components/graph.algorimths"
 
 // Función para verificar si alguna condición está activa
 function isAnyConditionActive(conditions: ConditionMap): boolean {
-  return Object.values(conditions).some((value) => value === true)
+  const activeConditions = Object.entries(conditions)
+    .filter(([_, value]) => value === true)
+    .map(([key]) => key)
+  
+  console.log("Condiciones activas:", activeConditions)
+  return activeConditions.length > 0
 }
 
 // Función heurística para estimar la distancia entre dos nodos (para A*)
-function heuristic(node: string, end: string, nodesMap: Record<string, { x: number; y: number }>): number {
+function heuristic(node: string, end: string, nodesMap: Record<string, { x: number; y: number }>, activeEdges: Edge[]): number {
+  // Buscar la arista directa entre node y end
+  const directEdge = activeEdges.find(e => e.from === node && e.to === end)
+  if (directEdge) {
+    return directEdge.distance
+  }
+
+  // Si no hay arista directa, buscar la ruta más corta a través de un nodo intermedio
+  const intermediateEdges = activeEdges.filter(e => e.from === node || e.to === end)
+  if (intermediateEdges.length > 0) {
+    const minDistance = Math.min(...intermediateEdges.map(e => e.distance))
+    return minDistance
+  }
+
+  // Si no hay rutas intermedias, usar la distancia euclidiana como aproximación
   const nodePos = nodesMap[node]
   const endPos = nodesMap[end]
 
   if (!nodePos || !endPos) return Number.POSITIVE_INFINITY
 
   return Math.sqrt(Math.pow(nodePos.x - endPos.x, 2) + Math.pow(nodePos.y - endPos.y, 2))
+}
+
+// Función para evaluar condiciones booleanas
+function evalCondition(expression: string, values: ConditionMap): boolean {
+  if (expression === "true") return true
+
+  try {
+    const keys = Object.keys(values) as (keyof ConditionMap)[]
+    const args = keys.map(k => values[k])
+    const fn = new Function(...keys, `return ${expression}`)
+    return fn(...args)
+  } catch {
+    return false
+  }
+}
+
+// Función para calcular el costo de una arista
+function getEdgeCost(edge: Edge, optimizeFor: "distance" | "time"): number {
+  if (optimizeFor === "distance") {
+    return edge.distance
+  } else {
+    // Calcular tiempo considerando el factor de tráfico
+    const baseTime = edge.estimatedTime || edge.distance * 3
+    const trafficFactor = edge.trafficFactor || 1.0
+    console.log(`Arista ${edge.from}->${edge.to}: tiempo base=${baseTime}, factor tráfico=${trafficFactor}`)
+    return baseTime * trafficFactor
+  }
+}
+
+// Función para verificar si hay condiciones activas (excepto permisoCarga)
+function hasActiveConditions(conditions: ConditionMap): boolean {
+  // Si solo permisoCarga está activo, no hay condiciones activas
+  const activeConditions = Object.entries(conditions)
+    .filter(([_, value]) => value === true)
+    .map(([key]) => key)
+  
+  return activeConditions.length > 1 || (activeConditions.length === 1 && activeConditions[0] !== "permisoCarga")
 }
 
 // Función principal que decide qué algoritmo usar según las condiciones
@@ -25,100 +80,139 @@ export function findShortestPathAStar(
   conditions: ConditionMap,
   optimizeFor: "distance" | "time" = "distance",
 ): PathResult | null {
-  // Verificar si hay alguna condición activa
-  const shouldFindLongestPath = isAnyConditionActive(conditions)
+  console.log("Buscando ruta de", start, "a", end)
+  console.log("Condiciones:", conditions)
 
-  // Filtrar aristas activas según las condiciones y manejar bidireccionalidad
-  const activeEdges: Edge[] = []
-
-  edges.forEach((edge) => {
-    if (evalCondition(edge.condition, conditions)) {
-      activeEdges.push(edge)
-      if (edge.bidirectional) {
-        const exists = activeEdges.some((e) => e.from === edge.to && e.to === edge.from)
-        if (!exists) {
-          activeEdges.push({ ...edge, from: edge.to, to: edge.from })
-        }
+  // Si no hay condiciones activas o solo permisoCarga está activo, usar ruta directa
+  if (!hasActiveConditions(conditions)) {
+    const directEdge = edges.find(e => e.from === start && e.to === end)
+    if (directEdge) {
+      console.log("Usando ruta directa")
+      console.log("Arista directa:", {
+        from: directEdge.from,
+        to: directEdge.to,
+        distance: directEdge.distance,
+        estimatedTime: directEdge.estimatedTime
+      })
+      return {
+        path: [start, end],
+        distance: directEdge.distance,
+        estimatedTime: directEdge.estimatedTime,
+        availableEdges: edges
       }
     }
-  })
+  }
+
+  // Filtrar aristas activas según las condiciones
+  const activeEdges = edges.filter(edge => evalCondition(edge.condition, conditions))
+  console.log("Aristas activas:", activeEdges.length)
+  console.log("Aristas activas detalle:", activeEdges.map(e => ({
+    from: e.from,
+    to: e.to,
+    distance: e.distance,
+    estimatedTime: e.estimatedTime,
+    condition: e.condition
+  })))
 
   if (activeEdges.length === 0) {
-    return null // No hay rutas válidas
+    console.log("No hay rutas válidas")
+    return null
   }
 
-  // Elegir el algoritmo apropiado
-  if (shouldFindLongestPath) {
-    return findLongestPath(start, end, activeEdges, nodesMap, optimizeFor)
-  } else {
-    return findOriginalShortestPath(start, end, activeEdges, nodesMap, optimizeFor)
-  }
-}
-
-// Algoritmo original para la ruta más corta
-function findOriginalShortestPath(
-  start: string,
-  end: string,
-  activeEdges: Edge[],
-  nodesMap: Record<string, { x: number; y: number }>,
-  optimizeFor: "distance" | "time",
-): PathResult | null {
+  // Inicializar estructuras para A*
   const openSet = new Set<string>([start])
   const closedSet = new Set<string>()
-  const gScore: Record<string, number> = {}
-  const fScore: Record<string, number> = {}
-  const previous: Record<string, string | null> = {}
+  const cameFrom = new Map<string, string>()
+  const gScore = new Map<string, number>()
+  const fScore = new Map<string, number>()
 
-  const allNodes = new Set<string>()
-  activeEdges.forEach((edge) => {
-    allNodes.add(edge.from)
-    allNodes.add(edge.to)
-  })
-
-  allNodes.forEach((node) => {
-    gScore[node] = node === start ? 0 : Number.POSITIVE_INFINITY
-    fScore[node] = node === start ? heuristic(start, end, nodesMap) : Number.POSITIVE_INFINITY
-    previous[node] = null
-  })
+  // Inicializar puntuaciones
+  gScore.set(start, 0)
+  fScore.set(start, 0)
 
   while (openSet.size > 0) {
-    let current: string | null = null
-    let lowestFScore = Number.POSITIVE_INFINITY
+    // Encontrar el nodo con menor fScore
+    let current = Array.from(openSet).reduce((a, b) => 
+      (fScore.get(a) || Infinity) < (fScore.get(b) || Infinity) ? a : b
+    )
 
-    openSet.forEach((node) => {
-      if (fScore[node] < lowestFScore) {
-        lowestFScore = fScore[node]
-        current = node
-      }
-    })
-
-    if (current === null) break
     if (current === end) {
-      return reconstructPath(current, previous, activeEdges)
+      return reconstructPath(cameFrom, current, activeEdges, optimizeFor)
     }
 
     openSet.delete(current)
     closedSet.add(current)
 
-    for (const edge of activeEdges) {
-      if (edge.from === current) {
-        const neighbor = edge.to
-        if (closedSet.has(neighbor)) continue
+    // Obtener vecinos válidos
+    const neighbors = activeEdges
+      .filter(edge => edge.from === current)
+      .map(edge => edge.to)
 
-        const costMetric = optimizeFor === "distance" ? edge.distance : edge.estimatedTime || edge.distance * 3
-        const tentativeGScore = gScore[current] + costMetric
+    for (const neighbor of neighbors) {
+      if (closedSet.has(neighbor)) continue
 
-        if (tentativeGScore < gScore[neighbor]) {
-          previous[neighbor] = current
-          gScore[neighbor] = tentativeGScore
-          fScore[neighbor] = tentativeGScore + heuristic(neighbor, end, nodesMap)
-          openSet.add(neighbor)
-        }
+      const edge = activeEdges.find(e => e.from === current && e.to === neighbor)
+      if (!edge) continue
+
+      // Calcular el costo de la arista
+      const cost = optimizeFor === "distance" ? edge.distance : edge.estimatedTime
+      const tentativeGScore = (gScore.get(current) || 0) + cost
+
+      if (!openSet.has(neighbor)) {
+        openSet.add(neighbor)
+      } else if (tentativeGScore >= (gScore.get(neighbor) || Infinity)) {
+        continue
       }
+
+      cameFrom.set(neighbor, current)
+      gScore.set(neighbor, tentativeGScore)
+      fScore.set(neighbor, tentativeGScore)
     }
   }
 
   return null
+}
+
+// Función para reconstruir la ruta
+function reconstructPath(
+  cameFrom: Map<string, string>,
+  current: string,
+  edges: Edge[],
+  optimizeFor: "distance" | "time"
+): PathResult {
+  const path: string[] = [current]
+  let totalDistance = 0
+  let totalTime = 0
+
+  while (cameFrom.has(current)) {
+    const previous = cameFrom.get(current)!
+    const edge = edges.find(e => e.from === previous && e.to === current)
+    
+    if (edge) {
+      totalDistance += edge.distance
+      totalTime += edge.estimatedTime
+      console.log(`Arista ${previous}->${current}:`, {
+        distance: edge.distance,
+        estimatedTime: edge.estimatedTime,
+        totalDistance,
+        totalTime
+      })
+    }
+    
+    current = previous
+    path.unshift(current)
+  }
+
+  console.log("Ruta encontrada:", path)
+  console.log("Distancia total:", totalDistance)
+  console.log("Tiempo total:", totalTime)
+
+  return {
+    path,
+    distance: totalDistance,
+    estimatedTime: totalTime,
+    availableEdges: edges
+  }
 }
 
 // Algoritmo para encontrar la ruta más larga (versión 2 - más eficiente)
@@ -288,36 +382,6 @@ function findLongestPathBellmanFord(
       totalDistance += edge.distance
       totalTime += edge.estimatedTime || edge.distance * 3
     }
-  }
-
-  return {
-    path,
-    distance: totalDistance,
-    estimatedTime: totalTime,
-    availableEdges: edges,
-  }
-}
-
-// Función para reconstruir el camino y calcular métricas
-function reconstructPath(current: string, previous: Record<string, string | null>, edges: Edge[]): PathResult {
-  const path: string[] = []
-  let node: string = current
-  let totalDistance = 0
-  let totalTime = 0
-
-  while (node) {
-    path.unshift(node)
-    const prev = previous[node]
-
-    if (prev) {
-      const edge = edges.find((e) => e.from === prev && e.to === node)
-      if (edge) {
-        totalDistance += edge.distance
-        totalTime += edge.estimatedTime || edge.distance * 3
-      }
-    }
-
-    node = prev as string
   }
 
   return {
